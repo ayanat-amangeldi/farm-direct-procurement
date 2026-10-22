@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../catalog/demo_catalog.dart';
 import '../catalog/models.dart';
+import '../orders/order_store.dart';
 import 'offers_screen.dart';
+import 'orders_screen.dart';
 import 'product_photo.dart';
 import 'shared.dart';
 
@@ -30,6 +32,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final store = OrderScope.of(context);
     final query = _search.text.trim().toLowerCase();
     final products = DemoCatalog.products
         .where(
@@ -85,15 +88,23 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                     ),
                                   ),
                                 ),
-                                const Icon(
-                                  Icons.location_on_outlined,
-                                  size: 16,
-                                  color: muted,
-                                ),
-                                const SizedBox(width: 4),
-                                const Text(
-                                  'Kazakhstan',
-                                  style: TextStyle(fontSize: 11, color: muted),
+                                TextButton.icon(
+                                  key: const Key('open-orders'),
+                                  onPressed: () => Navigator.of(context).push(
+                                    MaterialPageRoute<void>(
+                                      builder: (_) => const OrdersScreen(),
+                                    ),
+                                  ),
+                                  icon: const Icon(
+                                    Icons.receipt_long_outlined,
+                                    size: 19,
+                                  ),
+                                  label: Text(
+                                    store.orders.isEmpty
+                                        ? 'Orders'
+                                        : 'Orders (${store.orders.length})',
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
                                 ),
                               ],
                             ),
@@ -229,10 +240,22 @@ class _CatalogScreenState extends State<CatalogScreen> {
                             index,
                           ) {
                             final product = products[index];
+                            final offers = _catalog
+                                .offersFor(product.id)
+                                .where(
+                                  (offer) =>
+                                      store.availableKg(offer) >=
+                                      offer.minimumKg,
+                                )
+                                .toList();
                             return _ProductCard(
                               product: product,
-                              offers: _catalog.offersFor(product.id),
-                              fromPrice: _catalog.startingPrice(product.id),
+                              offers: offers,
+                              fromPrice: offers.isEmpty
+                                  ? null
+                                  : offers
+                                        .map((offer) => offer.pricePerKg)
+                                        .reduce((a, b) => a < b ? a : b),
                               onTap: () => Navigator.of(context).push(
                                 MaterialPageRoute<void>(
                                   builder: (_) =>
@@ -296,7 +319,7 @@ class _ProductCard extends StatelessWidget {
   });
   final Product product;
   final List<FarmerOffer> offers;
-  final int fromPrice;
+  final int? fromPrice;
   final VoidCallback onTap;
 
   @override
@@ -340,30 +363,31 @@ class _ProductCard extends StatelessWidget {
                     style: const TextStyle(fontSize: 12, color: muted),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    'From',
+                  Text(
+                    fromPrice == null ? 'Currently unavailable' : 'From',
                     style: TextStyle(fontSize: 11, color: muted),
                   ),
                   const SizedBox(height: 4),
-                  Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    spacing: 4,
-                    children: [
-                      Text(
-                        money(fromPrice),
-                        style: const TextStyle(
-                          fontSize: 21,
-                          color: ink,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.6,
+                  if (fromPrice != null)
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 4,
+                      children: [
+                        Text(
+                          money(fromPrice!),
+                          style: const TextStyle(
+                            fontSize: 21,
+                            color: ink,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.6,
+                          ),
                         ),
-                      ),
-                      const Text(
-                        '/ kg',
-                        style: TextStyle(fontSize: 11, color: muted),
-                      ),
-                    ],
-                  ),
+                        const Text(
+                          '/ kg',
+                          style: TextStyle(fontSize: 11, color: muted),
+                        ),
+                      ],
+                    ),
                   const Spacer(),
                   const Divider(height: 1, color: lineColor),
                   const SizedBox(height: 11),

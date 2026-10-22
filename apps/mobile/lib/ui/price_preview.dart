@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../catalog/models.dart';
+import '../orders/order.dart';
+import '../orders/order_store.dart';
 import 'shared.dart';
 
 class PricePreview extends StatefulWidget {
@@ -31,8 +33,9 @@ class _PricePreviewState extends State<PricePreview> {
   @override
   Widget build(BuildContext context) {
     final offer = widget.offer;
+    final remaining = OrderScope.of(context).availableKg(offer);
     final kg = int.tryParse(_quantity.text);
-    final error = offer.quantityError(kg);
+    final error = availableQuantityError(offer, kg, remaining);
     final quote = error == null
         ? offer.quote(kg: kg!, delivery: _delivery)
         : null;
@@ -91,7 +94,7 @@ class _PricePreviewState extends State<PricePreview> {
             decoration: InputDecoration(
               labelText: 'Quantity (kg)',
               helperText:
-                  'Minimum ${offer.minimumKg} kg · available ${offer.availableKg} kg',
+                  'Minimum ${offer.minimumKg} kg · available $remaining kg',
               errorText: error,
               suffixText: 'kg',
             ),
@@ -184,13 +187,25 @@ class _PricePreviewState extends State<PricePreview> {
           ),
           const SizedBox(height: 16),
           const Text(
-            'Demo price preview. No order is placed.',
+            'Continue to contact details to create a demo order. No payment is collected.',
             style: TextStyle(color: muted, fontSize: 12),
           ),
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
             child: FilledButton(
+              key: const Key('continue-checkout'),
+              onPressed: quote == null
+                  ? null
+                  : () => Navigator.pop(
+                      context,
+                      CheckoutSelection(kg: kg!, delivery: _delivery),
+                    ),
+              child: const Text('Continue to checkout'),
+            ),
+          ),
+          Center(
+            child: TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text('Back to offers'),
             ),

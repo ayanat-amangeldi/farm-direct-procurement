@@ -46,11 +46,13 @@ class EmptyResults extends StatelessWidget {
     required this.title,
     required this.message,
     required this.onReset,
+    this.resetLabel = 'Reset filters',
     super.key,
   });
   final String title;
   final String message;
   final VoidCallback onReset;
+  final String resetLabel;
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 12),
@@ -70,7 +72,7 @@ class EmptyResults extends StatelessWidget {
           style: const TextStyle(color: muted),
         ),
         const SizedBox(height: 16),
-        OutlinedButton(onPressed: onReset, child: const Text('Reset filters')),
+        OutlinedButton(onPressed: onReset, child: Text(resetLabel)),
       ],
     ),
   );

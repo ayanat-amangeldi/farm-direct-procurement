@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../catalog/demo_catalog.dart';
 import '../catalog/models.dart';
+import '../orders/order.dart';
+import '../orders/order_store.dart';
+import 'checkout_screen.dart';
 import 'price_preview.dart';
 import 'product_photo.dart';
 import 'shared.dart';
@@ -19,10 +22,38 @@ class _OffersScreenState extends State<OffersScreen> {
   bool _deliveryOnly = false;
   OfferSort _sort = OfferSort.price;
 
+  Future<void> _openOffer(FarmerOffer offer) async {
+    final selection = await showModalBottomSheet<CheckoutSelection>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.white,
+      constraints: const BoxConstraints(maxWidth: 680),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => PricePreview(product: widget.product, offer: offer),
+    );
+    if (selection == null || !mounted) return;
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => CheckoutScreen(
+          product: widget.product,
+          offer: offer,
+          selection: selection,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final offers = const DemoCatalog()
+    final store = OrderScope.of(context);
+    final available = const DemoCatalog()
         .offersFor(widget.product.id)
+        .where((offer) => store.availableKg(offer) >= offer.minimumKg)
+        .toList();
+    final offers = available
         .where((offer) => !_deliveryOnly || offer.deliveryFee != null)
         .toList();
     offers.sort(
@@ -148,9 +179,18 @@ class _OffersScreenState extends State<OffersScreen> {
               const SizedBox(height: 12),
               if (offers.isEmpty)
                 EmptyResults(
-                  title: 'No delivery offers yet',
-                  message: 'This product currently has pickup offers only.',
-                  onReset: () => setState(() => _deliveryOnly = false),
+                  title: available.isEmpty
+                      ? 'No available offers'
+                      : 'No delivery offers yet',
+                  message: available.isEmpty
+                      ? 'No farmer has the minimum quantity available in this demo.'
+                      : 'This product currently has pickup offers only.',
+                  onReset: available.isEmpty
+                      ? () => Navigator.pop(context)
+                      : () => setState(() => _deliveryOnly = false),
+                  resetLabel: available.isEmpty
+                      ? 'Back to catalog'
+                      : 'Reset filters',
                 )
               else
                 for (final offer in offers)
@@ -158,20 +198,8 @@ class _OffersScreenState extends State<OffersScreen> {
                     padding: const EdgeInsets.only(bottom: 14),
                     child: _OfferCard(
                       offer: offer,
-                      onTap: () => showModalBottomSheet<void>(
-                        context: context,
-                        isScrollControlled: true,
-                        useSafeArea: true,
-                        backgroundColor: Colors.white,
-                        constraints: const BoxConstraints(maxWidth: 680),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(20),
-                          ),
-                        ),
-                        builder: (_) =>
-                            PricePreview(product: widget.product, offer: offer),
-                      ),
+                      availableKg: store.availableKg(offer),
+                      onTap: () => _openOffer(offer),
                     ),
                   ),
             ],
@@ -183,8 +211,13 @@ class _OffersScreenState extends State<OffersScreen> {
 }
 
 class _OfferCard extends StatelessWidget {
-  const _OfferCard({required this.offer, required this.onTap});
+  const _OfferCard({
+    required this.offer,
+    required this.availableKg,
+    required this.onTap,
+  });
   final FarmerOffer offer;
+  final int availableKg;
   final VoidCallback onTap;
 
   @override
@@ -263,10 +296,7 @@ class _OfferCard extends StatelessWidget {
           spacing: 18,
           runSpacing: 10,
           children: [
-            Fact(
-              Icons.inventory_2_outlined,
-              '${offer.availableKg} kg available',
-            ),
+            Fact(Icons.inventory_2_outlined, '$availableKg kg available'),
             Fact(Icons.shopping_bag_outlined, 'Min. ${offer.minimumKg} kg'),
           ],
         ),
