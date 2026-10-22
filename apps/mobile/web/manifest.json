@@ -1,11 +1,11 @@
 {
-    "name": "farm_direct",
-    "short_name": "farm_direct",
+    "name": "Farm Direct",
+    "short_name": "Farm Direct",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#204F3C",
+    "theme_color": "#204F3C",
+    "description": "Direct farm procurement prototype with transparent prices.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

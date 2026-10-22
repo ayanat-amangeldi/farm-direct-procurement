@@ -14,6 +14,12 @@ First-stage Flutter prototype in development. The client lives in `apps/mobile`
 and supports Android, iOS, and web. Prototype data is fictional; no live farmers,
 payments, or orders are connected.
 
+The current increment includes a searchable catalog, category filters, separate
+farmer offers for each product, sorting, a delivery filter, and a quantity-based
+price preview. Order placement and tracking are still planned.
+
+[Prototype walkthrough and limitations](docs/prototype/catalog-and-offers.md)
+
 ## Run the Flutter Client
 
 Requirements: Flutter 3.41.9 with Dart 3.11.5 or a compatible newer SDK.
