@@ -1,18 +1,69 @@
 import 'package:flutter/material.dart';
+import '../catalog/models.dart';
 import '../orders/order.dart';
 import '../orders/order_store.dart';
 import 'order_widgets.dart';
 import 'shared.dart';
 
 class OrderDetailsScreen extends StatefulWidget {
-  const OrderDetailsScreen({required this.orderId, super.key});
+  const OrderDetailsScreen({required this.orderId, this.farmId, super.key});
   final String orderId;
+  final String? farmId;
   @override
   State<OrderDetailsScreen> createState() => _OrderDetailsScreenState();
 }
 
 class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   bool _cancelling = false;
+  bool _confirming = false;
+
+  Future<void> _confirm() async {
+    if (_confirming) return;
+    final store = OrderScope.of(context);
+    final order = store.find(widget.orderId);
+    if (order == null || order.farmId != widget.farmId) return;
+    final accepted = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm this demo order?'),
+        content: Text(
+          'Accept ${order.quantityKg} kg of ${order.productName.toLowerCase()} for ${money(order.total)}, including ${order.delivery ? 'delivery' : 'pickup'}. The saved price stays fixed.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Back'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Confirm order'),
+          ),
+        ],
+      ),
+    );
+    if (accepted != true || !mounted) return;
+    setState(() => _confirming = true);
+    try {
+      await store.confirm(widget.orderId, farmId: widget.farmId!);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Order confirmed. Buyer status updated on this device.',
+            ),
+          ),
+        );
+      }
+    } on OrderException catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error.message)));
+      }
+    } finally {
+      if (mounted) setState(() => _confirming = false);
+    }
+  }
 
   Future<void> _cancel() async {
     final store = OrderScope.of(context);
@@ -57,7 +108,13 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final order = OrderScope.of(context).find(widget.orderId);
+    final candidate = OrderScope.of(context).find(widget.orderId);
+    final farmerView = widget.farmId != null;
+    final order =
+        farmerView &&
+            (widget.farmId!.isEmpty || candidate?.farmId != widget.farmId)
+        ? null
+        : candidate;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -67,7 +124,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
         centerTitle: true,
       ),
       body: order == null
-          ? const Center(child: Text('Order not found on this device.'))
+          ? const Center(child: Text('Order not available in this view.'))
           : Align(
               alignment: Alignment.topCenter,
               child: ConstrainedBox(
@@ -75,9 +132,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
                   children: [
-                    const Text(
-                      'Order details',
-                      style: TextStyle(
+                    Text(
+                      farmerView ? 'Incoming order' : 'Order details',
+                      style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
                         letterSpacing: -0.8,
@@ -93,6 +150,14 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                       alignment: Alignment.centerLeft,
                       child: OrderStatusBadge(order.status),
                     ),
+                    if (order.confirmedAt != null) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        'Confirmed ${orderDate(order.confirmedAt!)}',
+                        key: const Key('order-confirmed-at'),
+                        style: const TextStyle(fontSize: 12, color: muted),
+                      ),
+                    ],
                     const SizedBox(height: 24),
                     OrderProductSummary(
                       productId: order.productId,
@@ -186,7 +251,27 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                       'Local demonstration only. No farmer has been contacted and no payment has been processed.',
                       style: TextStyle(color: muted, fontSize: 12, height: 1.5),
                     ),
-                    if (order.canCancel) ...[
+                    if (farmerView && order.status == OrderStatus.pending) ...[
+                      const SizedBox(height: 22),
+                      FilledButton.icon(
+                        key: const Key('confirm-farmer-order'),
+                        onPressed: _confirming ? null : _confirm,
+                        icon: const Icon(Icons.check, size: 18),
+                        label: Text(
+                          _confirming ? 'Saving…' : 'Confirm demo order',
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Confirmation updates the buyer’s status here. Price, quantity and delivery terms cannot be edited.',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: muted,
+                          height: 1.5,
+                        ),
+                      ),
+                    ],
+                    if (!farmerView && order.canCancel) ...[
                       const SizedBox(height: 22),
                       OutlinedButton(
                         key: const Key('cancel-order'),
@@ -217,13 +302,16 @@ class _OrderProgress extends StatelessWidget {
             order.delivery ? 'Ready for delivery' : 'Ready for pickup',
             'Completed',
           ];
-    final current = switch (order.status) {
-      OrderStatus.pending => 1,
-      OrderStatus.confirmed => 2,
+    final completedThrough = switch (order.status) {
+      OrderStatus.pending => 0,
+      OrderStatus.confirmed => 1,
       OrderStatus.ready => 2,
       OrderStatus.completed => 3,
       OrderStatus.cancelled => 1,
     };
+    final current = completedThrough < steps.length - 1
+        ? completedThrough + 1
+        : completedThrough;
     return Column(
       children: [
         for (var i = 0; i < steps.length; i++)
@@ -233,9 +321,7 @@ class _OrderProgress extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(
-                  i < current ||
-                          (i == current &&
-                              order.status == OrderStatus.completed)
+                  i <= completedThrough
                       ? Icons.check_circle
                       : i == current
                       ? Icons.radio_button_checked

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 
 import '../catalog/models.dart';
+import '../catalog/demo_catalog.dart';
 import 'order.dart';
 
 abstract interface class OrderPersistence {
@@ -57,12 +58,21 @@ class OrderStore extends ChangeNotifier {
     if (data['version'] != 1) {
       throw const FormatException('Unsupported order history.');
     }
-    store._orders = (data['orders'] as List)
-        .map(
-          (json) =>
-              ProcurementOrder.fromJson(Map<String, dynamic>.from(json as Map)),
-        )
-        .toList();
+    store._orders = (data['orders'] as List).map((json) {
+      final values = Map<String, dynamic>.from(json as Map);
+      // Version-1 orders predate farm IDs. Match known offer IDs only;
+      // an unknown offer stays buyer-visible but has no farmer owner.
+      if (values['farmId'] == null) {
+        values['farmId'] = '';
+        for (final offer in DemoCatalog.offers) {
+          if (offer.id == values['offerId']) {
+            values['farmId'] = offer.farmId;
+            break;
+          }
+        }
+      }
+      return ProcurementOrder.fromJson(values);
+    }).toList();
     if (store._orders.map((order) => order.id).toSet().length !=
         store._orders.length) {
       throw const FormatException('Duplicate order numbers.');
@@ -126,6 +136,7 @@ class OrderStore extends ChangeNotifier {
       productId: product.id,
       productName: product.name,
       offerId: offer.id,
+      farmId: offer.farmId,
       farmName: offer.farmName,
       farmRegion: offer.location,
       quantityKg: kg,
@@ -140,6 +151,31 @@ class OrderStore extends ChangeNotifier {
     );
     await _save([order, ..._orders]);
     return order;
+  }
+
+  List<ProcurementOrder> ordersForFarm(String farmId) => farmId.isEmpty
+      ? const []
+      : List.unmodifiable(_orders.where((order) => order.farmId == farmId));
+
+  Future<void> confirm(String id, {required String farmId}) async {
+    if (_writing) {
+      throw const OrderException(
+        'Another change is being saved. Please try again.',
+      );
+    }
+    final order = find(id);
+    if (farmId.isEmpty || order == null || order.farmId != farmId) {
+      throw const OrderException(
+        'This order is not available to the selected farm.',
+      );
+    }
+    if (order.status != OrderStatus.pending) {
+      throw const OrderException('Only an awaiting order can be confirmed.');
+    }
+    final confirmed = order.confirmed(_now());
+    await _save(
+      _orders.map((item) => item.id == id ? confirmed : item).toList(),
+    );
   }
 
   Future<void> cancel(String id) async {

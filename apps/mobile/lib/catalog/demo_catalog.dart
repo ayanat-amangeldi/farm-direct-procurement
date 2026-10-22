@@ -11,6 +11,26 @@ class DemoCatalog {
     productId,
   ).map((offer) => offer.pricePerKg).reduce((a, b) => a < b ? a : b);
 
+  static const farms = [
+    FarmProfile(id: 'saryarka', name: 'Saryarka Farm', region: 'Akmola region'),
+    FarmProfile(
+      id: 'green-valley',
+      name: 'Green Valley Farm',
+      region: 'Almaty region',
+    ),
+    FarmProfile(
+      id: 'bereke',
+      name: 'Bereke Family Farm',
+      region: 'Karaganda region',
+    ),
+    FarmProfile(
+      id: 'sunrise',
+      name: 'Sunrise Farm',
+      region: 'Turkistan region',
+    ),
+    FarmProfile(id: 'alatau', name: 'Alatau Orchard', region: 'Almaty region'),
+  ];
+
   static const products = [
     Product(
       id: 'potatoes',
@@ -54,6 +74,7 @@ class DemoCatalog {
     FarmerOffer(
       id: 'potato-1',
       productId: 'potatoes',
+      farmId: 'saryarka',
       farmName: 'Saryarka Farm',
       location: 'Akmola region',
       pricePerKg: 180,
@@ -64,6 +85,7 @@ class DemoCatalog {
     FarmerOffer(
       id: 'potato-2',
       productId: 'potatoes',
+      farmId: 'green-valley',
       farmName: 'Green Valley Farm',
       location: 'Almaty region',
       pricePerKg: 200,
@@ -74,6 +96,7 @@ class DemoCatalog {
     FarmerOffer(
       id: 'potato-3',
       productId: 'potatoes',
+      farmId: 'bereke',
       farmName: 'Bereke Family Farm',
       location: 'Karaganda region',
       pricePerKg: 190,
@@ -84,6 +107,7 @@ class DemoCatalog {
     FarmerOffer(
       id: 'carrot-1',
       productId: 'carrots',
+      farmId: 'saryarka',
       farmName: 'Saryarka Farm',
       location: 'Akmola region',
       pricePerKg: 160,
@@ -94,6 +118,7 @@ class DemoCatalog {
     FarmerOffer(
       id: 'carrot-2',
       productId: 'carrots',
+      farmId: 'bereke',
       farmName: 'Bereke Family Farm',
       location: 'Karaganda region',
       pricePerKg: 175,
@@ -104,6 +129,7 @@ class DemoCatalog {
     FarmerOffer(
       id: 'tomato-1',
       productId: 'tomatoes',
+      farmId: 'green-valley',
       farmName: 'Green Valley Farm',
       location: 'Almaty region',
       pricePerKg: 480,
@@ -114,6 +140,7 @@ class DemoCatalog {
     FarmerOffer(
       id: 'tomato-2',
       productId: 'tomatoes',
+      farmId: 'sunrise',
       farmName: 'Sunrise Farm',
       location: 'Turkistan region',
       pricePerKg: 450,
@@ -124,6 +151,7 @@ class DemoCatalog {
     FarmerOffer(
       id: 'cucumber-1',
       productId: 'cucumbers',
+      farmId: 'sunrise',
       farmName: 'Sunrise Farm',
       location: 'Turkistan region',
       pricePerKg: 350,
@@ -134,6 +162,7 @@ class DemoCatalog {
     FarmerOffer(
       id: 'cucumber-2',
       productId: 'cucumbers',
+      farmId: 'green-valley',
       farmName: 'Green Valley Farm',
       location: 'Almaty region',
       pricePerKg: 380,
@@ -144,6 +173,7 @@ class DemoCatalog {
     FarmerOffer(
       id: 'apple-1',
       productId: 'apples',
+      farmId: 'alatau',
       farmName: 'Alatau Orchard',
       location: 'Almaty region',
       pricePerKg: 420,
@@ -154,6 +184,7 @@ class DemoCatalog {
     FarmerOffer(
       id: 'apple-2',
       productId: 'apples',
+      farmId: 'green-valley',
       farmName: 'Green Valley Farm',
       location: 'Almaty region',
       pricePerKg: 450,
@@ -164,6 +195,7 @@ class DemoCatalog {
     FarmerOffer(
       id: 'wheat-1',
       productId: 'wheat',
+      farmId: 'saryarka',
       farmName: 'Saryarka Farm',
       location: 'Akmola region',
       pricePerKg: 110,

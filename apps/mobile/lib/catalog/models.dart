@@ -14,10 +14,22 @@ class Product {
   final ProductCategory category;
 }
 
+class FarmProfile {
+  const FarmProfile({
+    required this.id,
+    required this.name,
+    required this.region,
+  });
+  final String id;
+  final String name;
+  final String region;
+}
+
 class FarmerOffer {
   const FarmerOffer({
     required this.id,
     required this.productId,
+    required this.farmId,
     required this.farmName,
     required this.location,
     required this.pricePerKg,
@@ -28,6 +40,7 @@ class FarmerOffer {
 
   final String id;
   final String productId;
+  final String farmId;
   final String farmName;
   final String location;
   // All amounts are integer KZT. No floating-point arithmetic is used.

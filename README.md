@@ -21,6 +21,11 @@ open local order history, inspect saved price terms, and cancel an order that is
 awaiting confirmation. Orders survive a restart on the same device/browser;
 there is no shared server inventory or real payment.
 
+The Farmer workspace entry opens a demo farm selector, farm-specific incoming
+orders, awaiting/confirmed/all filters and order confirmation. Confirming an
+awaiting order preserves its agreed terms and updates the buyer's local history.
+The farm selector demonstrates roles; it is not authentication.
+
 [Prototype walkthrough and limitations](docs/prototype/catalog-and-offers.md)
 
 ## Run the Flutter Client
@@ -55,5 +60,7 @@ flutter test
 
 [YouTrack FARM project](https://farm-direct-procurement.youtrack.cloud/projects/FARM)
 
-The initial buyer prototype is tracked in FARM-8. Each implementation stage is
+The buyer prototype is tracked in FARM-8; farmer/admin prototype work is tracked
+in FARM-9. The current farmer increment covers incoming orders and confirmation;
+offer management and administrator screens remain future work. Each implementation stage is
 developed on a task branch and submitted for review.

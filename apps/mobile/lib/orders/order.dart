@@ -44,6 +44,7 @@ class ProcurementOrder {
     required this.productId,
     required this.productName,
     required this.offerId,
+    required this.farmId,
     required this.farmName,
     required this.farmRegion,
     required this.quantityKg,
@@ -55,6 +56,7 @@ class ProcurementOrder {
     required this.address,
     required this.note,
     required this.status,
+    this.confirmedAt,
   });
 
   final String id;
@@ -62,6 +64,7 @@ class ProcurementOrder {
   final String productId;
   final String productName;
   final String offerId;
+  final String farmId;
   final String farmName;
   final String farmRegion;
   final int quantityKg;
@@ -73,36 +76,45 @@ class ProcurementOrder {
   final String address;
   final String note;
   final OrderStatus status;
+  final DateTime? confirmedAt;
 
   int get subtotal => quantityKg * unitPrice;
   int get total => subtotal + deliveryFee;
   bool get canCancel => status == OrderStatus.pending;
 
-  ProcurementOrder cancelled() => ProcurementOrder(
-    id: id,
-    createdAt: createdAt,
-    productId: productId,
-    productName: productName,
-    offerId: offerId,
-    farmName: farmName,
-    farmRegion: farmRegion,
-    quantityKg: quantityKg,
-    unitPrice: unitPrice,
-    delivery: delivery,
-    deliveryFee: deliveryFee,
-    contactName: contactName,
-    phone: phone,
-    address: address,
-    note: note,
-    status: OrderStatus.cancelled,
-  );
+  ProcurementOrder cancelled() => _withStatus(OrderStatus.cancelled);
+  ProcurementOrder confirmed(DateTime at) =>
+      _withStatus(OrderStatus.confirmed, at: at);
 
-  Map<String, Object> toJson() => {
+  ProcurementOrder _withStatus(OrderStatus next, {DateTime? at}) =>
+      ProcurementOrder(
+        id: id,
+        createdAt: createdAt,
+        productId: productId,
+        productName: productName,
+        offerId: offerId,
+        farmId: farmId,
+        farmName: farmName,
+        farmRegion: farmRegion,
+        quantityKg: quantityKg,
+        unitPrice: unitPrice,
+        delivery: delivery,
+        deliveryFee: deliveryFee,
+        contactName: contactName,
+        phone: phone,
+        address: address,
+        note: note,
+        status: next,
+        confirmedAt: at ?? confirmedAt,
+      );
+
+  Map<String, Object?> toJson() => {
     'id': id,
     'createdAt': createdAt.toUtc().toIso8601String(),
     'productId': productId,
     'productName': productName,
     'offerId': offerId,
+    'farmId': farmId,
     'farmName': farmName,
     'farmRegion': farmRegion,
     'quantityKg': quantityKg,
@@ -114,6 +126,7 @@ class ProcurementOrder {
     'address': address,
     'note': note,
     'status': status.name,
+    'confirmedAt': confirmedAt?.toUtc().toIso8601String(),
   };
 
   factory ProcurementOrder.fromJson(Map<String, dynamic> json) {
@@ -123,6 +136,7 @@ class ProcurementOrder {
       productId: json['productId'] as String,
       productName: json['productName'] as String,
       offerId: json['offerId'] as String,
+      farmId: json['farmId'] as String? ?? '',
       farmName: json['farmName'] as String,
       farmRegion: json['farmRegion'] as String,
       quantityKg: json['quantityKg'] as int,
@@ -134,6 +148,9 @@ class ProcurementOrder {
       address: json['address'] as String,
       note: json['note'] as String,
       status: OrderStatus.values.byName(json['status'] as String),
+      confirmedAt: json['confirmedAt'] == null
+          ? null
+          : DateTime.parse(json['confirmedAt'] as String),
     );
     if (order.id.isEmpty ||
         order.quantityKg <= 0 ||

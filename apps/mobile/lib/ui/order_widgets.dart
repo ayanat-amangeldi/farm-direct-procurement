@@ -170,3 +170,108 @@ class OrderSection extends StatelessWidget {
     ),
   );
 }
+
+class OrderListCard extends StatelessWidget {
+  const OrderListCard({
+    required this.order,
+    required this.onTap,
+    this.showBuyer = false,
+    super.key,
+  });
+  final ProcurementOrder order;
+  final VoidCallback onTap;
+  final bool showBuyer;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(bottom: 16),
+    child: Material(
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: lineColor),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                spacing: 14,
+                runSpacing: 10,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Text(
+                    order.id,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  OrderStatusBadge(order.status),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                orderDate(order.createdAt),
+                style: const TextStyle(color: muted, fontSize: 11),
+              ),
+              const SizedBox(height: 18),
+              OrderProductSummary(
+                productId: order.productId,
+                productName: order.productName,
+                farmName: order.farmName,
+              ),
+              const SizedBox(height: 14),
+              if (showBuyer) ...[
+                Text(
+                  'Buyer: ${order.contactName}',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
+              Text(
+                '${order.quantityKg} kg · ${order.delivery ? 'Delivery' : 'Pickup'}',
+                style: const TextStyle(fontSize: 13, color: muted),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Divider(height: 1, color: lineColor),
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      money(order.total),
+                      style: const TextStyle(
+                        fontSize: 23,
+                        fontWeight: FontWeight.w700,
+                        color: forest,
+                      ),
+                    ),
+                  ),
+                  const Text(
+                    'View details',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: forest,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  const Icon(Icons.arrow_forward, size: 17, color: forest),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}

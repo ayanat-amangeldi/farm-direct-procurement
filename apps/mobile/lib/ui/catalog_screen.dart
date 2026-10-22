@@ -5,6 +5,7 @@ import '../catalog/models.dart';
 import '../orders/order_store.dart';
 import 'offers_screen.dart';
 import 'orders_screen.dart';
+import 'farmer_orders_screen.dart';
 import 'product_photo.dart';
 import 'shared.dart';
 
@@ -142,7 +143,21 @@ class _CatalogScreenState extends State<CatalogScreen> {
                             ),
                             const SizedBox(height: 16),
                             const DemoLabel(),
-                            const SizedBox(height: 22),
+                            const SizedBox(height: 8),
+                            TextButton.icon(
+                              key: const Key('open-farmer-workspace'),
+                              onPressed: () => Navigator.of(context).push(
+                                MaterialPageRoute<void>(
+                                  builder: (_) => const FarmerOrdersScreen(),
+                                ),
+                              ),
+                              icon: const Icon(
+                                Icons.agriculture_outlined,
+                                size: 18,
+                              ),
+                              label: const Text('Farmer workspace · demo'),
+                            ),
+                            const SizedBox(height: 14),
                             TextField(
                               key: const Key('catalog-search'),
                               controller: _search,

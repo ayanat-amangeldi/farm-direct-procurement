@@ -1,7 +1,8 @@
-# Buyer Procurement Prototype
+# Buyer and Farmer Procurement Prototype
 
 This implementation covers product discovery, comparison of farmer offers,
-price calculation, demo checkout, confirmation, and local order history. It is a Flutter application with shared UI for
+price calculation, demo checkout, local order history, and farmer confirmation.
+It is a Flutter application with shared UI for
 Android, iOS, and web. All farms, inventory, and prices are fictional fixtures.
 Product photography is illustrative and generated; it does not depict real
 listed stock. See [image sources and prompts](image-sources.md).
@@ -40,6 +41,30 @@ failed saves do not create duplicate orders or phantom stock reservations.
 To demonstrate an empty delivery result, open Wheat and enable Delivery available.
 Reset filters returns to its pickup offer.
 
+## Farmer Confirmation Demonstration
+
+1. Create another buyer order from Bereke Family Farm. Keep it awaiting confirmation.
+2. Return to the catalog and open Farmer workspace · demo. The default farm is
+   Bereke Family Farm; the selector also offers the other four fixture farms.
+3. The Awaiting filter shows only orders belonging to the selected farm, with
+   buyer name, product, quantity, fulfillment and saved total. Check Confirmed and
+   All orders to see the other statuses, including cancelled orders.
+4. Open the awaiting order. Inspect the original unit price, fees, contact details,
+   address/pickup region and note. Select Confirm demo order and accept the dialog.
+5. The status becomes Confirmed and a confirmation timestamp appears. Saved price,
+   quantity, delivery terms and stock reservation are unchanged. Confirmation does
+   not reserve the same stock a second time.
+6. Return to the buyer's My orders. The same order now shows Confirmed, including
+   after a refresh/relaunch. It can no longer be cancelled by the buyer in this
+   prototype. Cancelled or confirmed orders cannot be confirmed again.
+7. Select Saryarka Farm to verify that Bereke orders do not appear there. If no
+   orders exist, the empty state explains how to create an order for that farm.
+
+Older local orders are mapped to farms by their known offer IDs when loaded.
+Unknown historical offers remain in buyer history but are not assigned to any
+farm. The selector is a local demo role switch, not a security boundary or login;
+real accounts and server authorization are still required.
+
 ## Pricing Scope
 
 The demonstration uses whole kilograms and integer KZT amounts. Total equals
@@ -56,18 +81,20 @@ use sample contact details. If history cannot be loaded, the app preserves it an
 switches new orders to session-only mode with a visible notice. Failed writes
 show an error and leave the previous order list and local stock unchanged.
 
-No real order is sent to a farmer. There is no authentication, live backend,
-farmer dashboard, administrator dashboard, payment processing, or price history.
+No real order is sent to a farmer. The farmer workspace is a local demonstration.
+There is no authentication, live backend, farmer offer editor, administrator
+dashboard, payment processing, or price history.
 Stock deductions exist only in one device's demo history; they do not synchronize
 between buyers. The server must later enforce inventory, authorization, durable
 order snapshots and status transitions.
 
 FARM-8 remains in progress until its complete acceptance criteria are reviewed.
-The buyer can create an Awaiting confirmation order or cancel it. Confirmed,
-Ready and Completed are modeled for future integration, but the app does not
-pretend that a farmer has progressed the order. Farmer confirmation is a later
-workflow. This increment does not complete FARM-10's full data contract or price
-history.
+The buyer can create an Awaiting confirmation order or cancel it. The farmer can
+confirm an awaiting order, with the change visible to the buyer on the same device.
+Ready and Completed remain future transitions. FARM-9 remains open because this
+increment covers incoming orders/confirmation, not its offer management or
+administrator requirements. This does not complete FARM-10's full data contract
+or price history.
 
 ## Screenshots
 
@@ -85,17 +112,27 @@ Captured from the running Flutter web client at a 390 by 844 viewport.
 
 ![Saved order details](screenshots/order-details.jpg)
 
+![Farmer incoming orders](screenshots/farmer-incoming-orders.jpg)
+
+![Farmer confirmed order](screenshots/farmer-confirmed-order.jpg)
+
+![Confirmed status in buyer history](screenshots/buyer-confirmed-order.jpg)
+
 ## Structure and Checks
 
-- `apps/mobile/lib/catalog`: product/offer models, fixtures, quantity and price rules.
+- `apps/mobile/lib/catalog`: farm/product/offer models, fixtures, quantity and price rules.
 - `apps/mobile/lib/orders`: immutable order terms, validation, persistence and stock accounting.
-- `apps/mobile/lib/ui`: catalog, offers, checkout, confirmation, order history and details.
+- `apps/mobile/lib/ui`: catalog, offers, checkout, confirmation, buyer/farmer order lists and details.
 - `apps/mobile/test`: business-rule and user-interaction checks.
 
-Run `flutter analyze` and `flutter test` from `apps/mobile`. The 18 checks cover
+Run `flutter analyze` and `flutter test` from `apps/mobile`. The 25 checks cover
 pricing, filtering, narrow-screen catalog layout, checkout validation, creation,
-history restoration, cancellation, overselling, concurrent saves and storage errors.
+history restoration, cancellation, overselling, concurrent saves, storage errors,
+farm ownership, confirmation, immutable terms, legacy history migration and
+narrow-screen farmer layout.
 The web release and iOS Simulator debug builds also pass. Manual browser verification at 390 × 844 covers
 creation of a 50 kg delivery order, restart persistence, saved terms, cancellation
-and history filters. Android runtime verification still requires an emulator/device
+and history filters. Farmer verification adds role switching, farm-specific empty
+states, confirmation and the persisted Confirmed status in buyer history.
+Android runtime verification still requires an emulator/device
 and locally accepted Android SDK licenses.

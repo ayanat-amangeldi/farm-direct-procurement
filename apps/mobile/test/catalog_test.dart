@@ -9,6 +9,7 @@ Future<void> openPotatoes(WidgetTester tester) async {
     180,
     scrollable: find.byType(Scrollable).first,
   );
+  await tester.pumpAndSettle();
   await tester.tap(card);
   await tester.pumpAndSettle();
   await tester.scrollUntilVisible(
@@ -121,6 +122,7 @@ void main() {
     await tester.enterText(find.byKey(const Key('catalog-search')), 'wheat');
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.byKey(const Key('product-wheat')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('product-wheat')));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(
