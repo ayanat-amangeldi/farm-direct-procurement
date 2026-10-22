@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../catalog/demo_catalog.dart';
 import '../catalog/models.dart';
 import 'price_preview.dart';
-import 'produce_art.dart';
+import 'product_photo.dart';
 import 'shared.dart';
 
 enum OfferSort { price, farm }
@@ -30,87 +30,60 @@ class _OffersScreenState extends State<OffersScreen> {
           ? a.pricePerKg.compareTo(b.pricePerKg)
           : a.farmName.compareTo(b.farmName),
     );
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           'Farmer offers',
-          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
       ),
       body: Align(
         alignment: Alignment.topCenter,
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 760),
+          constraints: const BoxConstraints(maxWidth: 800),
           child: ListView(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: ProduceArt.background(widget.product.id),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 12, 18),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'STRAIGHT FROM THE GROWER',
-                              style: TextStyle(
-                                color: muted,
-                                fontSize: 9,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 1.1,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              widget.product.name,
-                              style: const TextStyle(
-                                fontSize: 29,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: -1,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              widget.product.description,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: muted,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        width: 100,
-                        height: 100,
-                        child: ProduceArt(widget.product.id),
-                      ),
-                    ],
-                  ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: SizedBox(
+                  height: 200,
+                  width: double.infinity,
+                  child: ProductPhoto(widget.product.id),
                 ),
               ),
-              const SizedBox(height: 18),
-              const DemoLabel(),
               const SizedBox(height: 20),
-              const Text(
-                'Choose your farmer',
-                style: TextStyle(
-                  fontSize: 23,
+              Text(
+                widget.product.name,
+                style: const TextStyle(
+                  fontSize: 31,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: -0.7,
+                  letterSpacing: -1,
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 5),
+              Text(
+                widget.product.description,
+                style: const TextStyle(fontSize: 14, color: muted),
+              ),
+              const SizedBox(height: 14),
+              const DemoLabel(),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 22),
+                child: Divider(height: 1, color: lineColor),
+              ),
               const Text(
-                'Compare unit prices and delivery terms.\nYour full total is shown in the price preview.',
+                'Compare farmer offers',
+                style: TextStyle(
+                  fontSize: 21,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Unit prices, minimum quantities and delivery costs are shown separately.',
                 style: TextStyle(color: muted, fontSize: 13, height: 1.5),
               ),
               const SizedBox(height: 14),
@@ -124,6 +97,9 @@ class _OffersScreenState extends State<OffersScreen> {
                     selected: _deliveryOnly,
                     onSelected: (value) =>
                         setState(() => _deliveryOnly = value),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     avatar: const Icon(Icons.local_shipping_outlined, size: 17),
                   ),
                   PopupMenuButton<OfferSort>(
@@ -145,11 +121,7 @@ class _OffersScreenState extends State<OffersScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
-                            Icons.sort_rounded,
-                            size: 18,
-                            color: muted,
-                          ),
+                          const Icon(Icons.sort, size: 17, color: muted),
                           const SizedBox(width: 5),
                           Text(
                             _sort == OfferSort.price
@@ -194,7 +166,7 @@ class _OffersScreenState extends State<OffersScreen> {
                         constraints: const BoxConstraints(maxWidth: 680),
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(28),
+                            top: Radius.circular(20),
                           ),
                         ),
                         builder: (_) =>
@@ -221,7 +193,7 @@ class _OfferCard extends StatelessWidget {
     padding: const EdgeInsets.all(18),
     decoration: BoxDecoration(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(22),
+      borderRadius: BorderRadius.circular(14),
       border: Border.all(color: lineColor),
     ),
     child: Column(
@@ -231,15 +203,20 @@ class _OfferCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(11),
+              width: 40,
+              height: 40,
+              alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: const Color(0xFFEEF2E7),
-                borderRadius: BorderRadius.circular(14),
+                color: const Color(0xFFF0F3F1),
+                borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(
-                Icons.agriculture_outlined,
-                size: 24,
-                color: forest,
+              child: Text(
+                offer.farmName.substring(0, 1),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: forest,
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -250,41 +227,41 @@ class _OfferCard extends StatelessWidget {
                   Text(
                     offer.farmName,
                     style: const TextStyle(
-                      fontSize: 17,
+                      fontSize: 16,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 6),
                   Fact(Icons.location_on_outlined, offer.location),
                 ],
               ),
             ),
           ],
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 20),
         Text.rich(
           TextSpan(
             children: [
               TextSpan(
                 text: money(offer.pricePerKg),
                 style: const TextStyle(
-                  color: forest,
-                  fontSize: 27,
+                  color: ink,
+                  fontSize: 28,
                   fontWeight: FontWeight.w700,
                   letterSpacing: -0.8,
                 ),
               ),
               const TextSpan(
                 text: ' / kg',
-                style: TextStyle(color: muted, fontSize: 14),
+                style: TextStyle(color: muted, fontSize: 13),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 14),
         Wrap(
           spacing: 18,
-          runSpacing: 8,
+          runSpacing: 10,
           children: [
             Fact(
               Icons.inventory_2_outlined,
@@ -294,7 +271,7 @@ class _OfferCard extends StatelessWidget {
           ],
         ),
         const Padding(
-          padding: EdgeInsets.symmetric(vertical: 14),
+          padding: EdgeInsets.symmetric(vertical: 16),
           child: Divider(height: 1, color: lineColor),
         ),
         Fact(
@@ -303,7 +280,7 @@ class _OfferCard extends StatelessWidget {
               ? 'Pickup only · no delivery fee'
               : 'Pickup free · delivery ${money(offer.deliveryFee!)}',
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 18),
         SizedBox(
           width: double.infinity,
           child: FilledButton(
@@ -314,7 +291,7 @@ class _OfferCard extends StatelessWidget {
               children: [
                 Text('View offer'),
                 SizedBox(width: 8),
-                Icon(Icons.arrow_forward, size: 17),
+                Icon(Icons.arrow_forward, size: 16),
               ],
             ),
           ),

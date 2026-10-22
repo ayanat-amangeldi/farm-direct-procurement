@@ -11,6 +11,12 @@ Future<void> openPotatoes(WidgetTester tester) async {
   );
   await tester.tap(card);
   await tester.pumpAndSettle();
+  await tester.scrollUntilVisible(
+    find.text('Delivery available'),
+    160,
+    scrollable: find.byType(Scrollable).first,
+  );
+  await tester.pumpAndSettle();
 }
 
 void main() {
@@ -117,10 +123,17 @@ void main() {
     await tester.ensureVisible(find.byKey(const Key('product-wheat')));
     await tester.tap(find.byKey(const Key('product-wheat')));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Delivery available'),
+      160,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Delivery available'));
     await tester.pumpAndSettle();
     expect(find.text('No delivery offers yet'), findsOneWidget);
     await tester.ensureVisible(find.text('Reset filters'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Reset filters'));
     await tester.pumpAndSettle();
     expect(find.text('1 offer available'), findsOneWidget);

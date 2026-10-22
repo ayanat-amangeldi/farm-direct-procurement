@@ -32,11 +32,11 @@ class FarmDirectApp extends StatelessWidget {
         filled: true,
         fillColor: Colors.white,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: lineColor),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: lineColor),
         ),
         contentPadding: const EdgeInsets.symmetric(
@@ -50,7 +50,7 @@ class FarmDirectApp extends StatelessWidget {
           foregroundColor: Colors.white,
           minimumSize: const Size(44, 48),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(10),
           ),
         ),
       ),

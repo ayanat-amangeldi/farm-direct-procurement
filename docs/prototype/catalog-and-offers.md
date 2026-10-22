@@ -3,6 +3,8 @@
 This first implementation covers product discovery, comparison of farmer offers,
 and an interactive price preview. It is a Flutter application with shared UI for
 Android, iOS, and web. All farms, inventory, and prices are fictional fixtures.
+Product photography is illustrative and generated; it does not depict real
+listed stock. See [image sources and prompts](image-sources.md).
 
 ## Demonstration
 

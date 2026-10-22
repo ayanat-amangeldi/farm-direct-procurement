@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../catalog/demo_catalog.dart';
 import '../catalog/models.dart';
 import 'offers_screen.dart';
-import 'produce_art.dart';
+import 'product_photo.dart';
 import 'shared.dart';
 
 class CatalogScreen extends StatefulWidget {
@@ -38,28 +38,24 @@ class _CatalogScreenState extends State<CatalogScreen> {
               product.name.toLowerCase().contains(query),
         )
         .toList();
-
     return Scaffold(
       body: SafeArea(
         child: Align(
           alignment: Alignment.topCenter,
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1120),
+            constraints: const BoxConstraints(maxWidth: 1160),
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final textScale =
-                    MediaQuery.textScalerOf(context).scale(14) / 14;
-                final columns = constraints.maxWidth < 360 || textScale > 1.3
+                final scale = MediaQuery.textScalerOf(context).scale(14) / 14;
+                final columns = constraints.maxWidth < 360 || scale > 1.3
                     ? 1
-                    : constraints.maxWidth >= 900
-                    ? 4
-                    : constraints.maxWidth >= 600
+                    : constraints.maxWidth >= 800
                     ? 3
                     : 2;
                 return CustomScrollView(
                   slivers: [
                     SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+                      padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
                       sliver: SliverToBoxAdapter(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,79 +65,79 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                 Container(
                                   padding: const EdgeInsets.all(9),
                                   decoration: BoxDecoration(
-                                    color: forest,
-                                    borderRadius: BorderRadius.circular(13),
+                                    color: ink,
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: const Icon(
-                                    Icons.eco_outlined,
+                                    Icons.spa_outlined,
                                     color: Colors.white,
-                                    size: 24,
+                                    size: 23,
                                   ),
                                 ),
                                 const SizedBox(width: 10),
                                 const Expanded(
                                   child: Text(
-                                    'FarmDirect',
+                                    'farmdirect',
                                     style: TextStyle(
-                                      fontSize: 23,
+                                      fontSize: 24,
                                       fontWeight: FontWeight.w800,
-                                      letterSpacing: -0.8,
+                                      letterSpacing: -1,
                                     ),
                                   ),
                                 ),
                                 const Icon(
                                   Icons.location_on_outlined,
+                                  size: 16,
                                   color: muted,
-                                  size: 17,
                                 ),
                                 const SizedBox(width: 4),
                                 const Text(
-                                  'KZ',
-                                  style: TextStyle(
-                                    color: muted,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                  'Kazakhstan',
+                                  style: TextStyle(fontSize: 11, color: muted),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 32),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 22),
+                              child: Divider(height: 1, color: lineColor),
+                            ),
                             const Text(
-                              'GROWN WITH CARE. BOUGHT DIRECT.',
+                              'PRODUCT CATALOG',
                               style: TextStyle(
-                                color: forest,
                                 fontSize: 10,
+                                letterSpacing: 1.8,
+                                color: forest,
                                 fontWeight: FontWeight.w700,
-                                letterSpacing: 1.7,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            const Text(
+                              'Agricultural\nmarketplace',
+                              style: TextStyle(
+                                fontSize: 34,
+                                height: 1.08,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -1.3,
                               ),
                             ),
                             const SizedBox(height: 12),
                             const Text(
-                              'Good food.\nCloser to the farm.',
+                              'Compare produce, growers and delivery terms\nin one place.',
                               style: TextStyle(
-                                fontSize: 36,
-                                height: 1.1,
-                                letterSpacing: -1.4,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            const Text(
-                              'Find your produce. Meet the growers.\nSee exactly what you pay.',
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: muted,
+                                fontSize: 14,
                                 height: 1.5,
+                                color: muted,
                               ),
                             ),
                             const SizedBox(height: 16),
                             const DemoLabel(),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 22),
                             TextField(
                               key: const Key('catalog-search'),
                               controller: _search,
                               onChanged: (_) => setState(() {}),
                               decoration: InputDecoration(
-                                hintText: 'Search potatoes, apples, and more',
+                                hintText: 'Search agricultural products',
                                 hintStyle: const TextStyle(
                                   fontSize: 13,
                                   color: muted,
@@ -149,6 +145,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                 prefixIcon: const Icon(
                                   Icons.search,
                                   color: muted,
+                                  size: 21,
                                 ),
                                 suffixIcon: _search.text.isEmpty
                                     ? null
@@ -156,11 +153,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                         tooltip: 'Clear search',
                                         onPressed: () =>
                                             setState(_search.clear),
-                                        icon: const Icon(Icons.close, size: 20),
+                                        icon: const Icon(Icons.close, size: 18),
                                       ),
                               ),
                             ),
-                            const SizedBox(height: 14),
+                            const SizedBox(height: 12),
                             SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: Row(
@@ -181,16 +178,16 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 28),
+                            const SizedBox(height: 24),
                             Row(
                               children: [
                                 const Expanded(
                                   child: Text(
-                                    'Explore the harvest',
+                                    'Available products',
                                     style: TextStyle(
-                                      fontSize: 21,
+                                      fontSize: 19,
                                       fontWeight: FontWeight.w700,
-                                      letterSpacing: -0.6,
+                                      letterSpacing: -0.3,
                                     ),
                                   ),
                                 ),
@@ -203,7 +200,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 14),
                           ],
                         ),
                       ),
@@ -224,8 +221,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
                               SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: columns,
                                 crossAxisSpacing: 14,
-                                mainAxisSpacing: 14,
-                                mainAxisExtent: 286 + (textScale - 1) * 130,
+                                mainAxisSpacing: 16,
+                                mainAxisExtent: 328 + (scale - 1) * 150,
                               ),
                           delegate: SliverChildBuilderDelegate((
                             context,
@@ -234,7 +231,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                             final product = products[index];
                             return _ProductCard(
                               product: product,
-                              offerCount: _catalog.offersFor(product.id).length,
+                              offers: _catalog.offersFor(product.id),
                               fromPrice: _catalog.startingPrice(product.id),
                               onTap: () => Navigator.of(context).push(
                                 MaterialPageRoute<void>(
@@ -248,19 +245,15 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       ),
                     const SliverToBoxAdapter(
                       child: Padding(
-                        padding: EdgeInsets.fromLTRB(20, 28, 20, 28),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.eco_outlined, size: 16, color: muted),
-                            SizedBox(width: 6),
-                            Flexible(
-                              child: Text(
-                                'Small farms. Clear choices.',
-                                style: TextStyle(color: muted, fontSize: 12),
-                              ),
-                            ),
-                          ],
+                        padding: EdgeInsets.all(24),
+                        child: Text(
+                          'Prices are per kilogram. Delivery is calculated for the selected farmer offer.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: muted,
+                            height: 1.5,
+                          ),
                         ),
                       ),
                     ),
@@ -280,14 +273,15 @@ class _CatalogScreenState extends State<CatalogScreen> {
       label: Text(title),
       selected: _category == category,
       showCheckmark: false,
-      selectedColor: forest,
-      backgroundColor: Colors.transparent,
+      selectedColor: ink,
+      backgroundColor: Colors.white,
       labelStyle: TextStyle(
         color: _category == category ? Colors.white : muted,
-        fontSize: 13,
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
       ),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-      side: BorderSide(color: _category == category ? forest : lineColor),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+      side: BorderSide(color: _category == category ? ink : lineColor),
       onSelected: (_) => setState(() => _category = category),
     ),
   );
@@ -296,12 +290,12 @@ class _CatalogScreenState extends State<CatalogScreen> {
 class _ProductCard extends StatelessWidget {
   const _ProductCard({
     required this.product,
-    required this.offerCount,
+    required this.offers,
     required this.fromPrice,
     required this.onTap,
   });
   final Product product;
-  final int offerCount;
+  final List<FarmerOffer> offers;
   final int fromPrice;
   final VoidCallback onTap;
 
@@ -309,7 +303,7 @@ class _ProductCard extends StatelessWidget {
   Widget build(BuildContext context) => Material(
     color: Colors.white,
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(22),
+      borderRadius: BorderRadius.circular(16),
       side: const BorderSide(color: lineColor),
     ),
     clipBehavior: Clip.antiAlias,
@@ -319,63 +313,73 @@ class _ProductCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            height: 118,
-            color: ProduceArt.background(product.id),
-            child: ProduceArt(product.id),
+          SizedBox(
+            height: 148,
+            width: double.infinity,
+            child: ProductPhoto(product.id),
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.fromLTRB(13, 14, 13, 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     product.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 19,
                       fontWeight: FontWeight.w700,
                       letterSpacing: -0.4,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 5),
                   Text(
-                    '$offerCount ${offerCount == 1 ? 'offer' : 'offers'}',
+                    '${offers.length} ${offers.length == 1 ? 'farmer' : 'farmers'}',
                     style: const TextStyle(fontSize: 12, color: muted),
                   ),
-                  const Spacer(),
+                  const SizedBox(height: 12),
                   const Text(
                     'From',
                     style: TextStyle(fontSize: 11, color: muted),
                   ),
                   const SizedBox(height: 4),
-                  Row(
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 4,
                     children: [
-                      Expanded(
-                        child: Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          spacing: 4,
-                          children: [
-                            Text(
-                              money(fromPrice),
-                              style: const TextStyle(
-                                color: forest,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const Text(
-                              '/ kg',
-                              style: TextStyle(color: muted, fontSize: 11),
-                            ),
-                          ],
+                      Text(
+                        money(fromPrice),
+                        style: const TextStyle(
+                          fontSize: 21,
+                          color: ink,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.6,
                         ),
                       ),
-                      const Icon(
-                        Icons.arrow_forward_rounded,
-                        size: 18,
-                        color: forest,
+                      const Text(
+                        '/ kg',
+                        style: TextStyle(fontSize: 11, color: muted),
                       ),
+                    ],
+                  ),
+                  const Spacer(),
+                  const Divider(height: 1, color: lineColor),
+                  const SizedBox(height: 11),
+                  const Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Compare',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: forest,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      Icon(Icons.arrow_forward, size: 16, color: forest),
                     ],
                   ),
                 ],

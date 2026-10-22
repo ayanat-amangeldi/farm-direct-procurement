@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-const forest = Color(0xFF204F3C);
-const ink = Color(0xFF22382D);
-const muted = Color(0xFF6C7A6E);
-const canvasColor = Color(0xFFF7F8F2);
-const lineColor = Color(0xFFE2E7DC);
+const forest = Color(0xFF17634A);
+const ink = Color(0xFF192D28);
+const muted = Color(0xFF697671);
+const canvasColor = Color(0xFFF6F7F8);
+const lineColor = Color(0xFFE3E8E5);
 
 class DemoLabel extends StatelessWidget {
   const DemoLabel({super.key});
@@ -12,7 +12,7 @@ class DemoLabel extends StatelessWidget {
   Widget build(BuildContext context) => const Row(
     mainAxisSize: MainAxisSize.min,
     children: [
-      Icon(Icons.science_outlined, size: 14, color: muted),
+      Icon(Icons.info_outline, size: 14, color: muted),
       SizedBox(width: 5),
       Flexible(
         child: Text(
