@@ -1,51 +1,227 @@
 # Farm Direct Procurement System
 
-## Project Description
-This diploma project focuses on developing an information system for direct agricultural product procurement from small farms with transparent pricing.
+**Diploma project:** Development of an information system for direct procurement
+of agricultural products from small-scale farms with transparent pricing.
 
-## Main Objectives
-- Connect small farmers directly with buyers.
-- Ensure transparent pricing of agricultural products.
-- Reduce intermediaries in the supply chain.
-- Simplify the ordering and purchasing process.
+Farm Direct connects small-scale farms with individual and business buyers.
+Farmers publish product offers and manage incoming orders; buyers compare offers
+for the same product and review the full price before ordering. Administrators
+manage account access and offer visibility.
 
-## Project Status
-First-stage Flutter prototype in development. The client lives in `apps/mobile`
-and supports Android, iOS, and web. Prototype data is fictional; no live farmers,
-payments, or orders are connected.
+[GitHub repository](https://github.com/ayanat-amangeldi/farm-direct-procurement)
+· [YouTrack project](https://farm-direct-procurement.youtrack.cloud/projects/FARM)
+· [Prototype walkthrough and screenshots](docs/prototype/catalog-and-offers.md)
 
-The current increment includes a searchable catalog, category filters, separate
-farmer offers for each product, sorting, a delivery filter, and a quantity-based
-price preview. Buyers can complete a demo checkout, view a numbered confirmation,
-open local order history, inspect saved price terms, and cancel an order that is
-awaiting confirmation. Orders survive a restart on the same device/browser;
-there is no shared server inventory or real payment.
+## Problem Statement
 
-Signing in as a farmer opens farm-specific incoming orders, status filters and
-order confirmation. Confirming an
-awaiting order preserves its agreed terms and updates the buyer's local history.
-Farmers can mark confirmed orders ready for pickup/delivery, then completed.
-They can reject awaiting or confirmed orders with a required reason visible to
-the buyer. Rejection releases local stock; completion keeps it consumed. The
-signed-in farmer can manage only their own farm.
+The project addresses the difficulty of comparing agricultural offers when unit
+prices, available quantities, minimum orders and delivery terms are presented
+separately. Small farms may also have limited channels for reaching buyers
+directly and managing procurement requests.
 
-Under Manage products, farmers can publish an offer for an existing product type
-or create a new product type. They can edit price, total stock, minimum quantity,
-pickup region, product details and delivery availability/fee. The buyer catalog
-uses those saved offers immediately. Stock already committed to orders cannot be
-removed, and existing orders keep their accepted prices. Custom product types use
-neutral image placeholders. Buyers and farmers can open Price history to inspect
-dated unit-price and delivery-fee changes. Only successful publications and
-price/fee edits are recorded; earlier history is not invented. These changes
-remain local to this device/browser.
+These are working problem assumptions from the project justification. Interviews,
+process observations and supporting evidence still need to validate their
+importance for the intended users. Benefits such as reduced comparison time or
+improved price comprehension have not yet been measured.
 
-The app now starts with local sign-in and buyer/farmer registration. Registration
-creates an independent buyer history or a new farm; it never grants administrator
-access. Logout clears the navigation stack. Accounts, farms, offers and orders
-persist together, but sessions do not: sign in again after restarting. Older demo
-orders belong to the seeded Demo Buyer account.
+## Aim and Objectives
 
-Demo credentials (fictional, shared password `FarmDemo2026!`):
+The aim is to develop an information system that supports direct procurement from
+small farms and makes agreed prices and order conditions clear to both parties.
+
+- Identify farmer and buyer needs and translate them into verifiable requirements.
+- Keep generic products separate from individual farmer offers so buyers can
+  compare like-for-like prices, quantities and fulfillment terms.
+- Show the item subtotal, delivery charge and final total before order placement.
+- Support farmer offer management and a traceable order lifecycle while preserving
+  accepted price terms and recording later offer-price changes.
+- Provide buyer, farmer and administrator roles and evaluate the resulting
+  workflows against defined functional checks and a user-evaluation plan.
+
+## Target Users
+
+| User group | Main needs |
+| --- | --- |
+| Small-scale farmers | Publish products, set prices and quantities, specify pickup/delivery terms, and manage incoming orders. |
+| Individual and business buyers | Find agricultural products, compare farmer offers, understand the full cost, place orders and track their status. |
+| Platform administrators | Review accounts, listings and orders; manage account restrictions and offer visibility with recorded reasons. |
+
+## Team and Responsibilities
+
+**Educational programme:** Software Engineering, Astana IT University.
+
+| Team member | Agreed responsibility | GitHub account |
+| --- | --- | --- |
+| Ayanat Amangeldi | Backend and transparent-pricing module: procurement-process analysis, data modelling, API design, order rules, price calculation and price-history logic. | [ayanat-amangeldi](https://github.com/ayanat-amangeldi) |
+| Dilyara Anetbayeva | Frontend and procurement scenarios: Flutter interface, buyer/farmer/admin screens, catalog and offer comparison, checkout, order-status presentation and usability. | [dilyara-anetbayeva](https://github.com/dilyara-anetbayeva) |
+
+**Supervisor:** Aldiyar Salkenov, Senior Lecturer.
+
+Requirements, architecture and technology decisions, integration, end-to-end
+verification, documentation and demonstrations are shared responsibilities. The
+module ownership above follows the project justification; it does not imply that
+the planned backend has already been implemented. Actual changes are traceable
+through commits, pull requests and assigned YouTrack tasks.
+
+## Expected Outcomes
+
+- An integrated procurement system in which farmers publish offers and buyers
+  place orders using clearly disclosed prices and fulfillment terms.
+- Preserved order-price snapshots and a dated history of offer-price changes,
+  allowing participants to distinguish agreed terms from later updates.
+- Documented requirements, architecture, technology decisions and verification
+  evidence, followed by evaluation of task completion and price comprehension.
+
+The current prototype demonstrates the main workflows on one device. A shared
+backend and representative-user evaluation are planned outcomes for later stages.
+
+## Scope and Current Status
+
+**As of 23 October 2026:** the local Flutter demonstration prototype is complete
+for its agreed scope and merged into `main`. It targets Android, iOS and web.
+Analysis/design documents and the formal evaluation plan are still being prepared
+for the first pre-defense; the complete submission package is not yet finished.
+
+### Implemented Prototype Features
+
+| Role or area | Available functionality |
+| --- | --- |
+| Buyer | Local sign-in/registration, product search and category filters, separate offers from multiple farms, sorting and delivery filtering, quantity-based price preview, validated checkout, numbered confirmation, own order history and cancellation of awaiting orders. |
+| Farmer | An account linked to one farm; create/edit offers and product types; manage price, stock, minimum quantity, pickup region and delivery terms; view own incoming orders; confirm, mark ready, complete or reject with a reason. |
+| Administrator | Account/offer/order overview, block/unblock buyers and farmers, hide/restore individual offers, required moderation reasons and dated decision history. Administrator accounts are protected from blocking. |
+| Pricing and data | Whole-kg validation, integer-KZT totals, separately disclosed delivery charges, fixed accepted-order snapshots, local stock accounting and dated unit-price/delivery-fee history. |
+
+The order lifecycle is **Awaiting confirmation → Confirmed → Ready → Completed**.
+Buyers can cancel awaiting orders. Farmers can reject awaiting or confirmed
+orders with a reason. Cancellation and rejection release local stock; completed
+quantities remain consumed. Existing orders retain their accepted terms when an
+offer is edited, hidden or its farmer is blocked.
+
+For the current single-offer order model:
+
+```text
+item subtotal = quantity in kg × agreed unit price in KZT/kg
+total = item subtotal + disclosed per-order delivery fee
+```
+
+Pickup is free. No additional platform charge is applied in the prototype.
+Prices are fixed when an order is placed. History records successful publications
+and subsequent price/delivery-fee changes; earlier history is not invented.
+
+### Prototype Boundaries
+
+- Accounts, farms, offers, orders and moderation records are stored locally on the
+  same device/browser. They survive restart, but sign-in sessions do not.
+- Role checks and salted password hashes demonstrate local account workflows.
+  Trusted authentication, authorization and shared inventory require a backend;
+  the device owner can inspect or alter local data.
+- All seeded farms, stock and prices are fictional. Use sample contact details and
+  a demo password. No real payment or farmer notification is sent.
+- Blocking a farmer excludes their offers from new purchases. Unblocking does not
+  restore offers explicitly hidden by an administrator. Farmers see moderation
+  reasons but cannot clear restrictions by editing their offers.
+- Product photography is illustrative and generated. Custom product types use
+  neutral placeholders; image upload is not connected.
+- Server synchronization, email verification, password recovery and real
+  transaction processing remain outside the current demonstration scope.
+
+## Technologies
+
+| Area | Current implementation |
+| --- | --- |
+| Client and language | Flutter with Dart; shared UI for Android, iOS and web. Verified with Flutter 3.41.9 and Dart 3.11.5. |
+| Interface | Material 3 widgets and responsive layouts. |
+| Local persistence | `shared_preferences`; versioned local JSON for accounts, catalog, orders, price history and moderation. |
+| Demo password handling | `cryptography`: per-account salts and PBKDF2-HMAC-SHA256 hashes with 100,000 iterations. |
+| Verification | `flutter_test` for calculation, state/persistence and widget checks; `flutter_lints` and `flutter analyze`. |
+| Development tools | Flutter SDK, Android Studio with Flutter/Dart plugins, Xcode and iPhone Simulator on macOS. |
+| Collaboration | Git, GitHub task branches/pull requests and YouTrack. |
+
+Python/FastAPI, PostgreSQL and REST are backend candidates from the project
+justification. They are not connected to this prototype; the final choices and
+alternatives must be documented in the technology comparison.
+
+## Repository Structure and Documentation
+
+```text
+apps/mobile/
+  lib/                 Flutter source: catalog, orders, accounts, moderation and UI
+  test/                Automated calculation, business-rule and widget checks
+  assets/products/     Illustrative product images
+  android/ ios/ web/   Platform project files
+  pubspec.yaml         Dependencies and SDK constraints
+  pubspec.lock         Resolved dependency versions
+docs/prototype/
+  catalog-and-offers.md Buyer, farmer and admin walkthroughs and check results
+  image-sources.md     Image provenance and generation prompts
+  screenshots/         Captured prototype screens
+FEATURES.md            System features and local implementation status
+README.md              Project overview, setup and verification instructions
+.gitignore             Generated/local-file exclusions
+```
+
+Available documentation:
+
+- [System features](FEATURES.md).
+- [Prototype scenarios, expected results, limitations and screenshots](docs/prototype/catalog-and-offers.md).
+- [Image sources and prompts](docs/prototype/image-sources.md).
+
+Outstanding documentation includes the project proposal and scope, evidence of
+user needs, critical literature review, existing-system and technology
+comparisons, prioritised requirements and acceptance criteria, architectural
+diagrams with editable sources, verification/evaluation plan, milestones/risks,
+and recorded supervisor feedback. These are tracked in YouTrack and will be
+added to this repository as they are completed.
+
+## Setup and Execution
+
+Install the Flutter SDK and confirm the available toolchains with `flutter doctor`.
+Clone the repository and install the client dependencies:
+
+```sh
+git clone https://github.com/ayanat-amangeldi/farm-direct-procurement.git
+cd farm-direct-procurement/apps/mobile
+flutter pub get
+```
+
+All Flutter commands below run from `apps/mobile`.
+
+### Android Studio and Android
+
+Open `apps/mobile` in Android Studio with the Flutter/Dart plugins enabled.
+Install the Android SDK and an emulator, accept the SDK licenses locally, and
+select an emulator or connected device. Run `lib/main.dart` from the IDE, or:
+
+```sh
+flutter devices
+flutter run -d <device-id>
+```
+
+### iPhone Simulator
+
+On macOS, install Xcode, its command-line tools, an iOS Simulator runtime and
+CocoaPods. Start Simulator, select the simulated iPhone in Android Studio, and run
+the same Flutter project. The device ID can also be selected with `flutter run` as
+above. Open `ios/Runner.xcworkspace` for work in Xcode.
+
+### Browser Preview
+
+```sh
+flutter run -d chrome
+```
+
+For a web-server preview:
+
+```sh
+flutter run -d web-server --web-hostname 127.0.0.1 --web-port 8357
+```
+
+Open the printed localhost address in a browser. Keep the Flutter process running.
+
+## Demo Accounts and Walkthrough
+
+These are intentionally public, fictional accounts for this local demonstration.
+Their shared demo password is `FarmDemo2026!`.
 
 | Role | Email |
 | --- | --- |
@@ -53,59 +229,64 @@ Demo credentials (fictional, shared password `FarmDemo2026!`):
 | Farmer — Bereke | `bereke@farm.demo` |
 | Administrator | `admin@farm.demo` |
 
-Administrators can block or unblock buyer/farmer accounts and hide or restore
-individual farmer offers, with a required reason of 5–300 characters. Blocked
-accounts cannot sign in; a blocked farmer's offers leave the catalog. Explicitly
-hidden offers stay hidden when their farmer is unblocked. A product type leaves
-the catalog when it has no visible offers. Existing orders, prices and committed
-stock are preserved, and cached checkout cannot order an unavailable offer.
-Administrators are protected against blocking. Farmers see why an offer is hidden
-and can edit it, but only an administrator can restore visibility. Restrictions
-and their local history survive restart (persistence schema v5; v1–4 migration).
+The sign-in screen lists four additional fixture farmer accounts. Registration
+creates an independent buyer account or a new farm; administrator accounts cannot
+be self-registered. Clearing browser/app storage removes locally saved changes.
 
-The sign-in screen also lists the other four fixture farmer accounts. Passwords
-are stored as salted PBKDF2-HMAC-SHA256 hashes (100,000 iterations), using
-[cryptography](https://pub.dev/packages/cryptography). This is a local prototype,
-not server authentication: device/browser data can be inspected or changed by its
-owner. Use sample data and a demo password. There is no email verification,
-password recovery, real payment, backend authorization or cross-device sync.
+A short demonstration:
 
-[Prototype walkthrough and limitations](docs/prototype/catalog-and-offers.md)
+1. Sign in as the buyer, search for Potatoes, and compare the three farmer offers.
+2. Select Bereke and 50 kg: pickup totals KZT 9,500; delivery adds KZT 2,500 for a
+   total of KZT 12,000. Use sample contact details and place a demo order.
+3. Sign out, sign in as Bereke, and advance the order through confirmation,
+   readiness and completion. Sign in as the buyer again to view the saved status.
+4. As the farmer, publish/edit an offer and inspect its dated price history.
+5. As administrator, hide/restore an offer or block/unblock an account with a
+   reason, then inspect History and the resulting buyer/farmer views.
 
-## Run the Flutter Client
+The [full walkthrough](docs/prototype/catalog-and-offers.md) includes invalid
+inputs, rejection, cancellation, persistence and moderation scenarios.
 
-Requirements: Flutter 3.41.9 with Dart 3.11.5 or a compatible newer SDK.
+## Testing and Verification
 
 ```sh
-cd apps/mobile
-flutter pub get
-flutter run
-```
-
-In Android Studio, open the `apps/mobile` folder, enable the Flutter/Dart plugins,
-and select an Android emulator or connected device. Android SDK licenses must be
-accepted locally before an Android build. For a browser preview, use
-`flutter run -d chrome`.
-
-For iPhone Simulator on macOS, install Xcode and an iOS simulator runtime, then
-start Simulator, select its device in Android Studio, and run the same Flutter
-project. You can also run `flutter run -d <simulator-id>` after `flutter devices`.
-Open `apps/mobile/ios/Runner.xcworkspace` when working directly in Xcode.
-
-## Check the Client
-
-```sh
-cd apps/mobile
 flutter analyze
 flutter test
 ```
 
-## Project Tracking
+Latest recorded implementation checks: **63 tests passed**, analysis reported no
+issues, and the following builds succeeded:
+
+```sh
+flutter build web --release --no-wasm-dry-run
+flutter build ios --simulator --debug
+```
+
+Manual browser checks used a 390 × 844 viewport; widget tests include 320 px layouts
+with larger text. An interactive iPhone Simulator walkthrough remains pending;
+a successful Simulator build does not establish runtime usability. Android build
+and device/emulator runtime checks remain pending local SDK-license/device setup.
+Representative-user evaluation and backend/security testing have not been run.
+
+## Project Tracking and Contribution Workflow
 
 [YouTrack FARM project](https://farm-direct-procurement.youtrack.cloud/projects/FARM)
+contains task owners, priorities, expected outcomes, acceptance criteria and
+applicable deadlines. Key items are [FARM-1: README](https://farm-direct-procurement.youtrack.cloud/issue/FARM-1),
+[FARM-8: buyer prototype](https://farm-direct-procurement.youtrack.cloud/issue/FARM-8),
+[FARM-9: farmer/admin prototype](https://farm-direct-procurement.youtrack.cloud/issue/FARM-9),
+[FARM-10: pricing and data contract](https://farm-direct-procurement.youtrack.cloud/issue/FARM-10)
+and [FARM-17: verification plan](https://farm-direct-procurement.youtrack.cloud/issue/FARM-17).
 
-The buyer prototype is tracked in FARM-8; farmer/admin prototype work is tracked
-in FARM-9. The current farmer increment covers incoming orders, the full order lifecycle and
-offer management. The administrator dashboard supports account blocking/unblocking,
-hiding/restoring farmer offers, and a dated moderation history with reasons.
-Each implementation stage is developed on a task branch and submitted for review.
+Use a task branch such as `codex/FARM-1-complete-readme`, include the task ID in the
+commit or PR description, link the change back to YouTrack, and describe its
+validation. Each student should use their own identifiable GitHub account and
+commit author details. Another team member should review changes before merging
+into `main`. Record supervisor feedback at agreed checkpoints and address it
+through traceable follow-up changes. Mark tasks complete when their acceptance
+criteria are met. Keep real credentials, API keys and private user data out of Git.
+
+The first submission tag `pre-defense-1` will be created when the submission
+package is ready. Later stages will use `pre-defense-2` and `final-pre-defense`;
+previous submission tags must remain fixed. Each submission should identify its
+tag, completed work, known limitations and outstanding tasks.
