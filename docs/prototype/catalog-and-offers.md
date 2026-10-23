@@ -1,7 +1,8 @@
 # Buyer and Farmer Procurement Prototype
 
 This implementation covers product discovery, comparison of farmer offers,
-price calculation, demo checkout, local order history, and farmer confirmation.
+price calculation, demo checkout, local order history, farmer confirmation, and
+farmer-managed product offers.
 It is a Flutter application with shared UI for
 Android, iOS, and web. All farms, inventory, and prices are fictional fixtures.
 Product photography is illustrative and generated; it does not depict real
@@ -65,6 +66,44 @@ Unknown historical offers remain in buyer history but are not assigned to any
 farm. The selector is a local demo role switch, not a security boundary or login;
 real accounts and server authorization are still required.
 
+## Farmer Product Management Demonstration
+
+1. Open Farmer workspace, select Bereke Family Farm, then Manage products. The
+   list shows its offers, current price, total stock, committed quantity and the
+   quantity still available to new buyers.
+2. Choose Add product. To join an existing comparison group, select a product type
+   that this farm does not already list. Types already listed are disabled; edit
+   their existing offers instead.
+3. To create a new group, leave New product type selected. Enter Onions, category
+   Vegetables, KZT 220/kg, total stock 100 kg, and minimum order 10 kg. Enable
+   delivery and enter KZT 700. Add a pickup region and optional offer details.
+4. Publish. The new product type and farm offer are saved together. Return to the
+   buyer catalog and search for Onions: a new product card shows Bereke's offer.
+5. Return to Manage products and edit Onions to KZT 240/kg. Save, then refresh.
+   The buyer still sees Onions at KZT 240/kg. A quote for 10 kg with delivery is
+   KZT 2,400 + KZT 700 = KZT 3,100.
+6. Existing orders retain their original price, quantity and delivery fee. If an
+   offer changes while an old quote is open, checkout rejects that stale quote
+   and asks the buyer to reopen the offer before ordering.
+7. Total stock includes saved, non-cancelled orders. It cannot be set below the
+   committed quantity. Zero stock pauses an uncommitted offer; offers without
+   enough remaining stock for the minimum order are unavailable to new buyers.
+8. Switching to another farm shows that farm's product list. An offer cannot be
+   edited on behalf of another selected farm. The product type of a published
+   offer stays fixed to preserve comparison groups; all other listed terms can
+   be edited. Product type names are unique, ignoring case and outer spaces.
+
+Quantities are whole kg (up to 1,000,000); prices and per-order delivery fees are
+whole KZT (up to 10,000,000). Price/minimum must be positive, stock and delivery
+fee may be zero. Delivery can be disabled, while pickup is always free. Stock
+must cover its minimum order unless zero. New types use a neutral image
+placeholder; uploading product photography remains future work.
+
+Catalog and orders share one versioned local save and one write lock. Version-1
+order-only history migrates to version 2 with the original catalog, preserving
+orders and their agreed terms. Failed writes publish neither a partial product
+nor a partial offer. Unreadable saved data is preserved with session-only fallback.
+
 ## Pricing Scope
 
 The demonstration uses whole kilograms and integer KZT amounts. Total equals
@@ -82,8 +121,8 @@ switches new orders to session-only mode with a visible notice. Failed writes
 show an error and leave the previous order list and local stock unchanged.
 
 No real order is sent to a farmer. The farmer workspace is a local demonstration.
-There is no authentication, live backend, farmer offer editor, administrator
-dashboard, payment processing, or price history.
+There is no authentication, live backend, administrator dashboard, payment
+processing, image upload, or price history.
 Stock deductions exist only in one device's demo history; they do not synchronize
 between buyers. The server must later enforce inventory, authorization, durable
 order snapshots and status transitions.
@@ -91,9 +130,8 @@ order snapshots and status transitions.
 FARM-8 remains in progress until its complete acceptance criteria are reviewed.
 The buyer can create an Awaiting confirmation order or cancel it. The farmer can
 confirm an awaiting order, with the change visible to the buyer on the same device.
-Ready and Completed remain future transitions. FARM-9 remains open because this
-increment covers incoming orders/confirmation, not its offer management or
-administrator requirements. This does not complete FARM-10's full data contract
+Ready and Completed remain future transitions. FARM-9 remains open for its administrator requirements and acceptance review;
+farmer incoming orders, confirmation and offer management are implemented. This does not complete FARM-10's full data contract
 or price history.
 
 ## Screenshots
@@ -118,6 +156,8 @@ Captured from the running Flutter web client at a 390 by 844 viewport.
 
 ![Confirmed status in buyer history](screenshots/buyer-confirmed-order.jpg)
 
+![Farmer-created product in buyer catalog](screenshots/custom-product-catalog.jpg)
+
 ## Structure and Checks
 
 - `apps/mobile/lib/catalog`: farm/product/offer models, fixtures, quantity and price rules.
@@ -125,14 +165,18 @@ Captured from the running Flutter web client at a 390 by 844 viewport.
 - `apps/mobile/lib/ui`: catalog, offers, checkout, confirmation, buyer/farmer order lists and details.
 - `apps/mobile/test`: business-rule and user-interaction checks.
 
-Run `flutter analyze` and `flutter test` from `apps/mobile`. The 25 checks cover
+Run `flutter analyze` and `flutter test` from `apps/mobile`. The 34 checks cover
 pricing, filtering, narrow-screen catalog layout, checkout validation, creation,
 history restoration, cancellation, overselling, concurrent saves, storage errors,
 farm ownership, confirmation, immutable terms, legacy history migration and
-narrow-screen farmer layout.
+narrow-screen farmer layout, product publication/editing, catalog restoration,
+stock-edit constraints, stale quotes, duplicate prevention, atomic save failures
+and the publication form on a narrow screen with larger text.
 The web release and iOS Simulator debug builds also pass. Manual browser verification at 390 × 844 covers
 creation of a 50 kg delivery order, restart persistence, saved terms, cancellation
 and history filters. Farmer verification adds role switching, farm-specific empty
 states, confirmation and the persisted Confirmed status in buyer history.
+Product-management verification publishes Onions, changes its price, refreshes,
+and checks the updated catalog card and KZT 3,100 delivery quote.
 Android runtime verification still requires an emulator/device
 and locally accepted Android SDK licenses.

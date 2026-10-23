@@ -3,6 +3,7 @@ import '../catalog/demo_catalog.dart';
 import '../orders/order.dart';
 import '../orders/order_store.dart';
 import 'order_details_screen.dart';
+import 'farmer_offers_screen.dart';
 import 'order_widgets.dart';
 import 'shared.dart';
 
@@ -92,6 +93,19 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen> {
               Text(
                 farm.region,
                 style: const TextStyle(fontSize: 12, color: muted),
+              ),
+              const SizedBox(height: 14),
+              OutlinedButton.icon(
+                key: const Key('manage-farmer-products'),
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => FarmerOffersScreen(farm: farm),
+                  ),
+                ),
+                icon: const Icon(Icons.inventory_2_outlined, size: 18),
+                label: Text(
+                  'Manage products (${store.farmOffers(_farmId).length})',
+                ),
               ),
               const SizedBox(height: 20),
               Container(

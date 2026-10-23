@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../catalog/demo_catalog.dart';
 import '../catalog/models.dart';
 import '../orders/order.dart';
 import '../orders/order_store.dart';
@@ -49,7 +48,7 @@ class _OffersScreenState extends State<OffersScreen> {
   @override
   Widget build(BuildContext context) {
     final store = OrderScope.of(context);
-    final available = const DemoCatalog()
+    final available = store
         .offersFor(widget.product.id)
         .where((offer) => store.availableKg(offer) >= offer.minimumKg)
         .toList();
@@ -291,6 +290,13 @@ class _OfferCard extends StatelessWidget {
             ],
           ),
         ),
+        if (offer.description.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Text(
+            offer.description,
+            style: const TextStyle(color: muted, fontSize: 13, height: 1.5),
+          ),
+        ],
         const SizedBox(height: 14),
         Wrap(
           spacing: 18,
