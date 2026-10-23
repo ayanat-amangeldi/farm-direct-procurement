@@ -33,7 +33,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
   Widget build(BuildContext context) {
     final store = OrderScope.of(context);
     final query = _search.text.trim().toLowerCase();
-    final products = store.products
+    final products = store.catalogProducts
         .where(
           (product) =>
               (_category == null || product.category == _category) &&

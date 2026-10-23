@@ -53,6 +53,16 @@ Demo credentials (fictional, shared password `FarmDemo2026!`):
 | Farmer — Bereke | `bereke@farm.demo` |
 | Administrator | `admin@farm.demo` |
 
+Administrators can block or unblock buyer/farmer accounts and hide or restore
+individual farmer offers, with a required reason of 5–300 characters. Blocked
+accounts cannot sign in; a blocked farmer's offers leave the catalog. Explicitly
+hidden offers stay hidden when their farmer is unblocked. A product type leaves
+the catalog when it has no visible offers. Existing orders, prices and committed
+stock are preserved, and cached checkout cannot order an unavailable offer.
+Administrators are protected against blocking. Farmers see why an offer is hidden
+and can edit it, but only an administrator can restore visibility. Restrictions
+and their local history survive restart (persistence schema v5; v1–4 migration).
+
 The sign-in screen also lists the other four fixture farmer accounts. Passwords
 are stored as salted PBKDF2-HMAC-SHA256 hashes (100,000 iterations), using
 [cryptography](https://pub.dev/packages/cryptography). This is a local prototype,
@@ -96,6 +106,6 @@ flutter test
 
 The buyer prototype is tracked in FARM-8; farmer/admin prototype work is tracked
 in FARM-9. The current farmer increment covers incoming orders, the full order lifecycle and
-offer management. A read-only administrator dashboard provides account, offer and
-order oversight; account blocking and listing moderation remain future work. Each implementation stage is
-developed on a task branch and submitted for review.
+offer management. The administrator dashboard supports account blocking/unblocking,
+hiding/restoring farmer offers, and a dated moderation history with reasons.
+Each implementation stage is developed on a task branch and submitted for review.

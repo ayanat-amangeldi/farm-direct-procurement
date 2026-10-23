@@ -50,7 +50,7 @@ void main() {
       expect(store.currentUser?.email, 'new@farm.demo');
       expect(memory.value, isNot(contains('SamplePassword123!')));
       expect(memory.value, isNot(contains('FarmDemo2026!')));
-      expect(jsonDecode(memory.value!)['version'], 4);
+      expect(jsonDecode(memory.value!)['version'], 5);
       final order = await store.place(
         product: DemoCatalog.products.first,
         offer: DemoCatalog.offers[2],

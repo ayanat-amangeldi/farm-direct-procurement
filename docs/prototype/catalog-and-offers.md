@@ -3,7 +3,7 @@
 This implementation covers product discovery, comparison of farmer offers,
 price calculation, demo checkout, local order history, farmer confirmation, and
 farmer-managed product offers, complete order transitions, recorded price history,
-local account registration, role-specific workspaces and administrator oversight.
+local account registration, role-specific workspaces and administrator moderation.
 It is a Flutter application with shared UI for
 Android, iOS, and web. All farms, inventory, and prices are fictional fixtures.
 Product photography is illustrative and generated; it does not depict real
@@ -174,8 +174,8 @@ show an error and leave the previous order list and local stock unchanged.
 No real order is sent to a farmer. The farmer workspace is a local demonstration.
 Authentication is a local demonstration with salted password hashes and three
 role-specific entry screens. There is no live backend, email verification,
-password recovery, payment processing, account blocking, listing moderation, or
-image upload. The administrator dashboard is read-only.
+password recovery, payment processing or image upload. Account blocking and
+listing moderation are implemented locally; trusted enforcement still needs a server.
 Stock deductions exist only in one device's demo history; they do not synchronize
 between buyers. The server must later enforce inventory, authorization, durable
 order snapshots and status transitions.
@@ -184,7 +184,7 @@ FARM-8 remains in progress until its complete acceptance criteria are reviewed.
 The buyer can create an Awaiting confirmation order or cancel it. The farmer can
 confirm, mark ready and complete an order, or reject it before readiness with a
 reason. Changes are visible to the buyer on the same device. FARM-9 remains open
-for administrator requirements and acceptance review. Price history is now
+for full acceptance review and remaining server requirements. Price history is now
 implemented locally; FARM-10's full server data contract and server-side pricing
 enforcement remain future work.
 
@@ -199,11 +199,11 @@ enforcement remain future work.
   pricing data are shared on this device. Administrator accounts cannot be
   self-registered and cannot place/cancel orders or act as farmers.
 - Sign in as `admin@farm.demo` / `FarmDemo2026!`. Inspect Accounts, Offers and Orders.
-  Details are read-only; counts reflect this device's current saved data.
+  Order details are read-only; counts reflect this device's current saved data.
 - Use Sign out on the workspace header. Previous routes are removed so Back cannot
   reopen the previous account's screens. Restarting also requires sign-in, while
   registered accounts and business data remain saved.
-- The local persistence schema is version 4. Versions 1–3 migrate without
+- The local persistence schema is version 5. Versions 1–4 migrate without
   inventing owners: legacy orders map to the seeded Demo Buyer. Unreadable data is
   preserved and the app falls back to a visibly marked session-only demo.
 - Passwords use per-account salts and PBKDF2-HMAC-SHA256 with 100,000 iterations
@@ -212,10 +212,50 @@ enforcement remain future work.
   against someone who can alter local storage; real multiuser operation requires
   backend authentication, access checks and storage.
 
+## Administrator Moderation Demonstration
+
+1. Sign in as `admin@farm.demo`. Accounts supports name/email/role search. Choose
+   Block account on a buyer or farmer, supply a 5–300 character reason, and confirm.
+   The status and reason update only after a successful save. Administrator accounts
+   have a Protected administrator label and cannot be blocked.
+2. Sign out and try the blocked account's correct credentials. Sign-in is refused
+   with the reason. Re-registering the same email does not bypass the restriction.
+   Sign back in as administrator and Unblock account with a review reason.
+3. Open Offers and search by product or farm. Hide offer removes only that farmer's
+   listing from comparison. If a product type has no visible offers, its catalog
+   card disappears. An existing cached quote cannot be ordered after hiding.
+4. Sign in as the owning farmer and open My products. The hidden listing remains
+   editable with a Hidden by administrator notice and reason. Price/stock edits
+   do not clear moderation. Sign in as administrator to Restore offer.
+5. Blocking a farmer also excludes all that farm's offers from new purchases.
+   Unblocking restores eligible offers, while offers explicitly hidden by an
+   administrator remain hidden. Restoring a listing does not override a blocked
+   farmer. Stock/minimum constraints still apply to visible offers.
+6. Open History to inspect hide/restore and block/unblock decisions, their reason,
+   administrator ID and timestamp. Refresh, sign in again and verify the saved
+   statuses and history. Versions 1–4 start with no invented moderation records.
+
+Moderation never rewrites or deletes accepted order terms, price history or stock
+commitments. Existing orders remain in the owning buyer/farmer and administrator
+histories. Blocking prevents that account's sign-in and new activity, rather than
+automatically cancelling orders. Failed writes retain the preceding status and
+history; concurrent writes cannot change the acting account or lose a decision.
+This remains a same-device local demonstration, not shared server moderation.
+
 ## Screenshots
 
 Captured from the running Flutter web client at a 390 by 844 viewport.
 Earlier screenshots document previous increments; the current app starts at sign-in.
+
+![Administrator account blocking](screenshots/admin-blocked-account.png)
+
+![Blocked sign-in](screenshots/admin-blocked-login.png)
+
+![Administrator hides an offer](screenshots/admin-hidden-offer.png)
+
+![Farmer sees the moderation reason](screenshots/admin-farmer-hidden-notice.png)
+
+![Dated moderation history](screenshots/admin-moderation-history.png)
 
 ![Local sign-in](screenshots/account-login.png)
 
@@ -253,12 +293,14 @@ Earlier screenshots document previous increments; the current app starts at sign
 
 ## Structure and Checks
 
+- `apps/mobile/lib/admin`: moderation decisions and reason validation.
+
 - `apps/mobile/lib/catalog`: farm/product/offer models, fixtures, quantity and price rules.
 - `apps/mobile/lib/orders`: immutable order terms, validation, persistence and stock accounting.
 - `apps/mobile/lib/ui`: catalog, offers, checkout, confirmation, buyer/farmer order lists and details.
 - `apps/mobile/test`: business-rule and user-interaction checks.
 
-Run `flutter analyze` and `flutter test` from `apps/mobile`. The 53 checks cover
+Run `flutter analyze` and `flutter test` from `apps/mobile`. The 63 checks cover
 pricing, filtering, narrow-screen catalog layout, checkout validation, creation,
 history restoration, cancellation, overselling, concurrent saves, storage errors,
 farm ownership, confirmation, immutable terms, legacy history migration and
@@ -273,6 +315,12 @@ password hashing, registration rollback, independent farm ownership, buyer histo
 isolation, denied cross-role actions, administrator self-registration denial,
 concurrent registration, signed-out restoration, legacy owner migration, login
 errors, navigation reset and registration at 320 px with larger text.
+Ten moderation checks add administrator-only actions, protected administrators,
+required reasons, block/unblock persistence, hidden cached checkout rejection,
+independent offer and farm restrictions, restoration rules, farmer-edit isolation,
+unchanged saved terms, failed hide/restore and block/unblock saves, concurrent
+moderation, schema v4 migration, corrupt history preservation, a narrow-screen
+admin workflow and buyer/farmer visibility checks.
 The web release and iOS Simulator debug builds also pass. Manual browser verification at 390 × 844 covers
 creation of a 50 kg delivery order, restart persistence, saved terms, cancellation
 and history filters. Farmer verification adds account switching, farm-specific empty
@@ -288,3 +336,9 @@ and locally accepted Android SDK licenses.
 Account verification signs in as buyer, Bereke farmer and administrator at
 390 × 844, checks preserved legacy orders, creates Sample Orchard as a new farm,
 and signs into that saved farm again after refresh.
+
+Moderation browser verification blocks Demo Buyer, observes refused sign-in with
+its reason, then unblocks the account. It hides Onions, observes no buyer search
+results, restarts and checks the farmer's hidden-offer notice, then restores the
+offer and inspects the four dated decisions in History. Demo restrictions used
+for this walkthrough are cleared at the end.
