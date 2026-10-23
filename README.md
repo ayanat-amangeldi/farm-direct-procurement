@@ -24,14 +24,20 @@ there is no shared server inventory or real payment.
 The Farmer workspace entry opens a demo farm selector, farm-specific incoming
 orders, awaiting/confirmed/all filters and order confirmation. Confirming an
 awaiting order preserves its agreed terms and updates the buyer's local history.
-The farm selector demonstrates roles; it is not authentication.
+Farmers can mark confirmed orders ready for pickup/delivery, then completed.
+They can reject awaiting or confirmed orders with a required reason visible to
+the buyer. Rejection releases local stock; completion keeps it consumed. The
+farm selector demonstrates roles; it is not authentication.
 
 Under Manage products, farmers can publish an offer for an existing product type
 or create a new product type. They can edit price, total stock, minimum quantity,
 pickup region, product details and delivery availability/fee. The buyer catalog
 uses those saved offers immediately. Stock already committed to orders cannot be
 removed, and existing orders keep their accepted prices. Custom product types use
-neutral image placeholders. These changes remain local to this device/browser.
+neutral image placeholders. Buyers and farmers can open Price history to inspect
+dated unit-price and delivery-fee changes. Only successful publications and
+price/fee edits are recorded; earlier history is not invented. These changes
+remain local to this device/browser.
 
 [Prototype walkthrough and limitations](docs/prototype/catalog-and-offers.md)
 

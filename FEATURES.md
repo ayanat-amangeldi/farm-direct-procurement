@@ -6,6 +6,8 @@
 •⁠  ⁠Set and update product prices
 •⁠  ⁠View and manage customer orders
 
+•⁠  ⁠Progress orders through readiness and completion, or reject them with a reason
+
 ## 2. Buyer Features
 •⁠  ⁠Buyer registration and authentication
 •⁠  ⁠Browse agricultural products
@@ -18,6 +20,8 @@
 •⁠  ⁠Show price breakdowns
 •⁠  ⁠Provide information about farmers
 •⁠  ⁠Display delivery costs separately
+
+•⁠  ⁠Show dated unit-price and delivery-fee change history
 
 ## 4. Administration
 •⁠  ⁠Manage user accounts

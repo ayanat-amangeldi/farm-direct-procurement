@@ -2,7 +2,7 @@
 
 This implementation covers product discovery, comparison of farmer offers,
 price calculation, demo checkout, local order history, farmer confirmation, and
-farmer-managed product offers.
+farmer-managed product offers, complete order transitions, and recorded price history.
 It is a Flutter application with shared UI for
 Android, iOS, and web. All farms, inventory, and prices are fictional fixtures.
 Product photography is illustrative and generated; it does not depict real
@@ -66,6 +66,29 @@ Unknown historical offers remain in buyer history but are not assigned to any
 farm. The selector is a local demo role switch, not a security boundary or login;
 real accounts and server authorization are still required.
 
+## Order Lifecycle Demonstration
+
+The supported path is Awaiting confirmation → Confirmed → Ready → Completed.
+Only the selected owning demo farm can advance the order; stages cannot be
+skipped, repeated or reversed. The ready action says Ready for pickup or Ready
+for delivery according to the saved fulfillment method. Completion asks the
+farmer to confirm that collection/delivery happened. Each successful transition
+stores a timestamp and appears in both buyer and farmer views after a restart.
+
+From Awaiting confirmation or Confirmed, the farmer can choose Reject order.
+A trimmed reason of 5–300 characters is required and shown to the buyer with the
+Rejected status. Rejection returns the quantity to local stock. After readiness,
+rejection is unavailable. Buyer cancellation remains available only while
+awaiting confirmation. Completed, Rejected and Cancelled are terminal statuses.
+Completed quantities stay consumed; completing does not replenish stock.
+
+To demonstrate, advance one order through confirmation, readiness and completion.
+Place another order, reject it with “Harvest damaged during packing.”, then open
+it from the buyer's My orders. Check the Completed/Rejected filters and verify
+that rejected orders are absent from Active. All accepted prices and delivery
+fees stay unchanged throughout the lifecycle. Save failures and concurrent
+changes leave the preceding saved state intact rather than showing false success.
+
 ## Farmer Product Management Demonstration
 
 1. Open Farmer workspace, select Bereke Family Farm, then Manage products. The
@@ -104,6 +127,31 @@ order-only history migrates to version 2 with the original catalog, preserving
 orders and their agreed terms. Failed writes publish neither a partial product
 nor a partial offer. Unreadable saved data is preserved with session-only fallback.
 
+## Price History Demonstration
+
+Open Price history from either a buyer's farmer-offer card or the farmer's My
+products list. The screen displays the current price/delivery terms and newest
+recorded changes first. Each record shows date/time (including seconds), old and
+new unit prices, increase/decrease in KZT per kg, and any delivery-fee change.
+Delivery switching between pickup-only, free delivery and paid delivery is
+recorded explicitly.
+
+1. Open an existing offer with no history. The screen honestly reports that no
+   price changes have been recorded; earlier prices/dates are unavailable.
+2. Edit Onions from KZT 240 to KZT 260 per kg and save. The history shows
+   KZT 240 → KZT 260, an increase of KZT 20/kg, with the actual local save time.
+3. Change only stock or description. No price record is created. Change a delivery
+   fee or delivery availability and a new record is created even if unit price
+   stays unchanged. A new publication records its initial price and delivery terms.
+4. Refresh/relaunch, then open the same history from the buyer's offer card. The
+   records persist, while old orders keep their original agreed terms.
+
+History records, catalog and orders are written together in version-3 local
+storage. Versions 1 and 2 migrate with empty earlier price history; original order
+and catalog data are preserved. Records are created only after successful saves,
+so a failed edit produces neither a new price nor a false historical event. This
+is a local demo log, not a server-authenticated audit trail.
+
 ## Pricing Scope
 
 The demonstration uses whole kilograms and integer KZT amounts. Total equals
@@ -122,17 +170,18 @@ show an error and leave the previous order list and local stock unchanged.
 
 No real order is sent to a farmer. The farmer workspace is a local demonstration.
 There is no authentication, live backend, administrator dashboard, payment
-processing, image upload, or price history.
+processing, or image upload.
 Stock deductions exist only in one device's demo history; they do not synchronize
 between buyers. The server must later enforce inventory, authorization, durable
 order snapshots and status transitions.
 
 FARM-8 remains in progress until its complete acceptance criteria are reviewed.
 The buyer can create an Awaiting confirmation order or cancel it. The farmer can
-confirm an awaiting order, with the change visible to the buyer on the same device.
-Ready and Completed remain future transitions. FARM-9 remains open for its administrator requirements and acceptance review;
-farmer incoming orders, confirmation and offer management are implemented. This does not complete FARM-10's full data contract
-or price history.
+confirm, mark ready and complete an order, or reject it before readiness with a
+reason. Changes are visible to the buyer on the same device. FARM-9 remains open
+for administrator requirements and acceptance review. Price history is now
+implemented locally; FARM-10's full server data contract and server-side pricing
+enforcement remain future work.
 
 ## Screenshots
 
@@ -158,6 +207,12 @@ Captured from the running Flutter web client at a 390 by 844 viewport.
 
 ![Farmer-created product in buyer catalog](screenshots/custom-product-catalog.jpg)
 
+![Completed order progress](screenshots/order-completed-progress.jpg)
+
+![Farmer rejection visible to the buyer](screenshots/order-rejected.jpg)
+
+![Recorded price change](screenshots/price-history.jpg)
+
 ## Structure and Checks
 
 - `apps/mobile/lib/catalog`: farm/product/offer models, fixtures, quantity and price rules.
@@ -165,18 +220,24 @@ Captured from the running Flutter web client at a 390 by 844 viewport.
 - `apps/mobile/lib/ui`: catalog, offers, checkout, confirmation, buyer/farmer order lists and details.
 - `apps/mobile/test`: business-rule and user-interaction checks.
 
-Run `flutter analyze` and `flutter test` from `apps/mobile`. The 34 checks cover
+Run `flutter analyze` and `flutter test` from `apps/mobile`. The 44 checks cover
 pricing, filtering, narrow-screen catalog layout, checkout validation, creation,
 history restoration, cancellation, overselling, concurrent saves, storage errors,
 farm ownership, confirmation, immutable terms, legacy history migration and
 narrow-screen farmer layout, product publication/editing, catalog restoration,
 stock-edit constraints, stale quotes, duplicate prevention, atomic save failures
-and the publication form on a narrow screen with larger text.
+and the publication form on a narrow screen with larger text. Additional checks
+cover valid/invalid lifecycle transitions, rejection reasons and released stock,
+consumed completed stock, timestamps, transition save failures, concurrent actions,
+price/delivery history, legacy migration and responsive history screens.
 The web release and iOS Simulator debug builds also pass. Manual browser verification at 390 × 844 covers
 creation of a 50 kg delivery order, restart persistence, saved terms, cancellation
 and history filters. Farmer verification adds role switching, farm-specific empty
 states, confirmation and the persisted Confirmed status in buyer history.
 Product-management verification publishes Onions, changes its price, refreshes,
-and checks the updated catalog card and KZT 3,100 delivery quote.
+and checks the updated catalog card and KZT 3,100 delivery quote. Lifecycle checks
+complete a delivery order, reject another with a visible reason, and verify both
+after refresh. History checks change Onions from KZT 240 to KZT 260 and inspect
+the saved old/new values and timestamp.
 Android runtime verification still requires an emulator/device
 and locally accepted Android SDK licenses.

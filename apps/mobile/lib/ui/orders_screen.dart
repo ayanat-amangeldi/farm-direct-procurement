@@ -5,7 +5,7 @@ import 'order_details_screen.dart';
 import 'order_widgets.dart';
 import 'shared.dart';
 
-enum OrdersFilter { all, active, completed, cancelled }
+enum OrdersFilter { all, active, completed, cancelled, rejected }
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -17,11 +17,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
   OrdersFilter _filter = OrdersFilter.all;
   bool _matches(ProcurementOrder order) => switch (_filter) {
     OrdersFilter.all => true,
-    OrdersFilter.active =>
-      order.status != OrderStatus.completed &&
-          order.status != OrderStatus.cancelled,
+    OrdersFilter.active => order.isActive,
     OrdersFilter.completed => order.status == OrderStatus.completed,
     OrdersFilter.cancelled => order.status == OrderStatus.cancelled,
+    OrdersFilter.rejected => order.status == OrderStatus.rejected,
   };
 
   @override
@@ -75,6 +74,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     _chip('Active', OrdersFilter.active),
                     _chip('Completed', OrdersFilter.completed),
                     _chip('Cancelled', OrdersFilter.cancelled),
+                    _chip('Rejected', OrdersFilter.rejected),
                   ],
                 ),
               ),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../catalog/models.dart';
 import '../orders/order.dart';
 import '../orders/order_store.dart';
 import 'order_widgets.dart';
+import 'farmer_order_actions.dart';
 import 'shared.dart';
 
 class OrderDetailsScreen extends StatefulWidget {
@@ -15,56 +15,6 @@ class OrderDetailsScreen extends StatefulWidget {
 
 class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   bool _cancelling = false;
-  bool _confirming = false;
-
-  Future<void> _confirm() async {
-    if (_confirming) return;
-    final store = OrderScope.of(context);
-    final order = store.find(widget.orderId);
-    if (order == null || order.farmId != widget.farmId) return;
-    final accepted = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirm this demo order?'),
-        content: Text(
-          'Accept ${order.quantityKg} kg of ${order.productName.toLowerCase()} for ${money(order.total)}, including ${order.delivery ? 'delivery' : 'pickup'}. The saved price stays fixed.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Back'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Confirm order'),
-          ),
-        ],
-      ),
-    );
-    if (accepted != true || !mounted) return;
-    setState(() => _confirming = true);
-    try {
-      await store.confirm(widget.orderId, farmId: widget.farmId!);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Order confirmed. Buyer status updated on this device.',
-            ),
-          ),
-        );
-      }
-    } on OrderException catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(error.message)));
-      }
-    } finally {
-      if (mounted) setState(() => _confirming = false);
-    }
-  }
-
   Future<void> _cancel() async {
     final store = OrderScope.of(context);
     final confirmed = await showDialog<bool>(
@@ -156,6 +106,44 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                         'Confirmed ${orderDate(order.confirmedAt!)}',
                         key: const Key('order-confirmed-at'),
                         style: const TextStyle(fontSize: 12, color: muted),
+                      ),
+                    ],
+                    if (order.status == OrderStatus.rejected) ...[
+                      const SizedBox(height: 18),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFEEEB),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Farmer rejection reason',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF9D3F35),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              order.rejectionReason,
+                              key: const Key('order-rejection-reason'),
+                              style: const TextStyle(fontSize: 14, height: 1.5),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'The quantity is available again in this local demo.',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: muted,
+                                height: 1.5,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                     const SizedBox(height: 24),
@@ -251,26 +239,12 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                       'Local demonstration only. No farmer has been contacted and no payment has been processed.',
                       style: TextStyle(color: muted, fontSize: 12, height: 1.5),
                     ),
-                    if (farmerView && order.status == OrderStatus.pending) ...[
-                      const SizedBox(height: 22),
-                      FilledButton.icon(
-                        key: const Key('confirm-farmer-order'),
-                        onPressed: _confirming ? null : _confirm,
-                        icon: const Icon(Icons.check, size: 18),
-                        label: Text(
-                          _confirming ? 'Saving…' : 'Confirm demo order',
-                        ),
+                    if (farmerView)
+                      FarmerOrderActions(
+                        key: ValueKey('actions-${order.id}'),
+                        order: order,
+                        farmId: widget.farmId!,
                       ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        'Confirmation updates the buyer’s status here. Price, quantity and delivery terms cannot be edited.',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: muted,
-                          height: 1.5,
-                        ),
-                      ),
-                    ],
                     if (!farmerView && order.canCancel) ...[
                       const SizedBox(height: 22),
                       OutlinedButton(
@@ -294,21 +268,37 @@ class _OrderProgress extends StatelessWidget {
   final ProcurementOrder order;
   @override
   Widget build(BuildContext context) {
-    final steps = order.status == OrderStatus.cancelled
-        ? ['Order created', 'Order cancelled']
-        : [
-            'Order created',
-            'Farmer confirmation',
-            order.delivery ? 'Ready for delivery' : 'Ready for pickup',
-            'Completed',
+    final terminal =
+        order.status == OrderStatus.cancelled ||
+        order.status == OrderStatus.rejected;
+    final steps = terminal
+        ? <(String, DateTime?)>[
+            ('Order created', order.createdAt),
+            if (order.confirmedAt != null)
+              ('Farmer confirmation', order.confirmedAt),
+            if (order.status == OrderStatus.rejected)
+              ('Order rejected', order.rejectedAt)
+            else
+              ('Order cancelled', order.cancelledAt),
+          ]
+        : <(String, DateTime?)>[
+            ('Order created', order.createdAt),
+            ('Farmer confirmation', order.confirmedAt),
+            (
+              order.delivery ? 'Ready for delivery' : 'Ready for pickup',
+              order.readyAt,
+            ),
+            ('Completed', order.completedAt),
           ];
-    final completedThrough = switch (order.status) {
-      OrderStatus.pending => 0,
-      OrderStatus.confirmed => 1,
-      OrderStatus.ready => 2,
-      OrderStatus.completed => 3,
-      OrderStatus.cancelled => 1,
-    };
+    final completedThrough = terminal
+        ? steps.length - 1
+        : switch (order.status) {
+            OrderStatus.pending => 0,
+            OrderStatus.confirmed => 1,
+            OrderStatus.ready => 2,
+            OrderStatus.completed => 3,
+            _ => 0,
+          };
     final current = completedThrough < steps.length - 1
         ? completedThrough + 1
         : completedThrough;
@@ -331,15 +321,28 @@ class _OrderProgress extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    steps[i],
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: i <= current ? ink : muted,
-                      fontWeight: i == current
-                          ? FontWeight.w600
-                          : FontWeight.w400,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        steps[i].$1,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: i <= current ? ink : muted,
+                          fontWeight: i == current
+                              ? FontWeight.w600
+                              : FontWeight.w400,
+                        ),
+                      ),
+                      if (i <= completedThrough && steps[i].$2 != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: Text(
+                            orderDate(steps[i].$2!),
+                            style: const TextStyle(fontSize: 11, color: muted),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
                 if (i == 1 && order.status == OrderStatus.pending)

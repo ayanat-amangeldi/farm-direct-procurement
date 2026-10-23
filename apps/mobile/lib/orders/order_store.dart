@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import '../catalog/models.dart';
 import '../catalog/offer_draft.dart';
+import '../catalog/price_change.dart';
 import '../catalog/demo_catalog.dart';
 import 'order.dart';
 
@@ -42,6 +43,10 @@ class OrderStore extends ChangeNotifier {
   final bool sessionOnly;
   final bool loadFailed;
   List<ProcurementOrder> _orders = [];
+  List<PriceChange> _priceHistory = [];
+  List<PriceChange> priceHistoryFor(String offerId) => List.unmodifiable(
+    _priceHistory.where((item) => item.offerId == offerId).toList().reversed,
+  );
   List<Product> _products = List.of(DemoCatalog.products);
   List<FarmerOffer> _offers = List.of(DemoCatalog.offers);
 
@@ -68,7 +73,9 @@ class OrderStore extends ChangeNotifier {
   int reservedKg(String offerId) => _orders
       .where(
         (order) =>
-            order.offerId == offerId && order.status != OrderStatus.cancelled,
+            order.offerId == offerId &&
+            order.status != OrderStatus.cancelled &&
+            order.status != OrderStatus.rejected,
       )
       .fold(0, (sum, order) => sum + order.quantityKg);
   bool _writing = false;
@@ -86,10 +93,10 @@ class OrderStore extends ChangeNotifier {
     final raw = await persistence.read();
     if (raw == null) return store;
     final data = jsonDecode(raw) as Map<String, dynamic>;
-    if (data['version'] != 1 && data['version'] != 2) {
+    if (![1, 2, 3].contains(data['version'])) {
       throw const FormatException('Unsupported order history.');
     }
-    if (data['version'] == 2) {
+    if (data['version'] == 2 || data['version'] == 3) {
       if (data['products'] is! List || data['offers'] is! List) {
         throw const FormatException('Missing saved catalog.');
       }
@@ -144,6 +151,24 @@ class OrderStore extends ChangeNotifier {
     if (store._orders.map((order) => order.id).toSet().length !=
         store._orders.length) {
       throw const FormatException('Duplicate order numbers.');
+    }
+    if (data['version'] == 3) {
+      if (data['priceHistory'] is! List) {
+        throw const FormatException('Missing saved price history.');
+      }
+      store._priceHistory = (data['priceHistory'] as List)
+          .map(
+            (item) =>
+                PriceChange.fromJson(Map<String, dynamic>.from(item as Map)),
+          )
+          .toList();
+      if (store._priceHistory.map((item) => item.id).toSet().length !=
+              store._priceHistory.length ||
+          store._priceHistory.any(
+            (item) => store.offer(item.offerId)?.farmId != item.farmId,
+          )) {
+        throw const FormatException('Inconsistent saved price history.');
+      }
     }
     return store;
   }
@@ -237,7 +262,29 @@ class OrderStore extends ChangeNotifier {
     final nextOffers = existing == null
         ? [..._offers, saved]
         : _offers.map((item) => item.id == existing.id ? saved : item).toList();
-    await _save(_orders, products: nextProducts, offers: nextOffers);
+    final nextHistory = List<PriceChange>.of(_priceHistory);
+    if (existing == null ||
+        existing.pricePerKg != saved.pricePerKg ||
+        existing.deliveryFee != saved.deliveryFee) {
+      nextHistory.add(
+        PriceChange(
+          id: _nextId('price-change', _priceHistory.map((item) => item.id)),
+          offerId: saved.id,
+          farmId: saved.farmId,
+          at: _now(),
+          oldPrice: existing?.pricePerKg,
+          newPrice: saved.pricePerKg,
+          oldDeliveryFee: existing?.deliveryFee,
+          newDeliveryFee: saved.deliveryFee,
+        ),
+      );
+    }
+    await _save(
+      _orders,
+      products: nextProducts,
+      offers: nextOffers,
+      priceHistory: nextHistory,
+    );
     return saved;
   }
 
@@ -324,7 +371,29 @@ class OrderStore extends ChangeNotifier {
       ? const []
       : List.unmodifiable(_orders.where((order) => order.farmId == farmId));
 
-  Future<void> confirm(String id, {required String farmId}) async {
+  Future<void> confirm(String id, {required String farmId}) =>
+      _farmerTransition(id, farmId: farmId, target: OrderStatus.confirmed);
+  Future<void> markReady(String id, {required String farmId}) =>
+      _farmerTransition(id, farmId: farmId, target: OrderStatus.ready);
+  Future<void> complete(String id, {required String farmId}) =>
+      _farmerTransition(id, farmId: farmId, target: OrderStatus.completed);
+  Future<void> reject(
+    String id, {
+    required String farmId,
+    required String reason,
+  }) => _farmerTransition(
+    id,
+    farmId: farmId,
+    target: OrderStatus.rejected,
+    reason: reason,
+  );
+
+  Future<void> _farmerTransition(
+    String id, {
+    required String farmId,
+    required OrderStatus target,
+    String reason = '',
+  }) async {
     if (_writing) {
       throw const OrderException(
         'Another change is being saved. Please try again.',
@@ -336,13 +405,31 @@ class OrderStore extends ChangeNotifier {
         'This order is not available to the selected farm.',
       );
     }
-    if (order.status != OrderStatus.pending) {
-      throw const OrderException('Only an awaiting order can be confirmed.');
+    final allowed = switch (target) {
+      OrderStatus.confirmed => order.status == OrderStatus.pending,
+      OrderStatus.ready => order.status == OrderStatus.confirmed,
+      OrderStatus.completed => order.status == OrderStatus.ready,
+      OrderStatus.rejected => order.canReject,
+      _ => false,
+    };
+    if (!allowed) {
+      throw const OrderException(
+        'This status change is not available for this order.',
+      );
     }
-    final confirmed = order.confirmed(_now());
-    await _save(
-      _orders.map((item) => item.id == id ? confirmed : item).toList(),
-    );
+    if (target == OrderStatus.rejected &&
+        rejectionReasonError(reason) != null) {
+      throw OrderException(rejectionReasonError(reason)!);
+    }
+    final at = _now();
+    final changed = switch (target) {
+      OrderStatus.confirmed => order.confirmed(at),
+      OrderStatus.ready => order.markedReady(at),
+      OrderStatus.completed => order.completed(at),
+      OrderStatus.rejected => order.rejected(at, reason.trim()),
+      _ => throw const OrderException('Unsupported order status.'),
+    };
+    await _save(_orders.map((item) => item.id == id ? changed : item).toList());
   }
 
   Future<void> cancel(String id) async {
@@ -356,7 +443,9 @@ class OrderStore extends ChangeNotifier {
       throw const OrderException('This order cannot be cancelled.');
     }
     await _save(
-      _orders.map((item) => item.id == id ? item.cancelled() : item).toList(),
+      _orders
+          .map((item) => item.id == id ? item.cancelled(_now()) : item)
+          .toList(),
     );
   }
 
@@ -364,14 +453,17 @@ class OrderStore extends ChangeNotifier {
     List<ProcurementOrder> candidate, {
     List<Product>? products,
     List<FarmerOffer>? offers,
+    List<PriceChange>? priceHistory,
   }) async {
     final nextProducts = products ?? _products;
     final nextOffers = offers ?? _offers;
+    final nextHistory = priceHistory ?? _priceHistory;
     _writing = true;
     try {
       await _persistence.write(
         jsonEncode({
-          'version': 2,
+          'version': 3,
+          'priceHistory': nextHistory.map((item) => item.toJson()).toList(),
           'products': nextProducts.map((item) => item.toJson()).toList(),
           'offers': nextOffers.map((item) => item.toJson()).toList(),
           'orders': candidate.map((order) => order.toJson()).toList(),
@@ -380,6 +472,7 @@ class OrderStore extends ChangeNotifier {
       _orders = candidate;
       _products = nextProducts;
       _offers = nextOffers;
+      _priceHistory = nextHistory;
       notifyListeners();
     } catch (_) {
       throw const OrderException(
