@@ -32,9 +32,32 @@ shapes, labels and connectors. The source is uncompressed diagrams.net XML.
    if the design changes, and include the FARM task ID in the change's branch
    and commit or PR description.
 
-The initial repository copies preserve the existing source and exports without
-changing their bytes. Layout details in later exports can depend on the editor;
-check the resulting images for clipped labels and connector alignment.
+All visible figure titles, subtitles, workflow headings and explanatory notes
+are individual text objects in the `.drawio` source. Edit these source objects
+before exporting; captions are not added separately to the images.
+
+## Reproducing the Published Exports
+
+The exports are generated directly from the `.drawio` file with draw.io Desktop
+32.6.1. From the repository root, run:
+
+```sh
+bash diagrams/export.sh
+```
+
+On macOS, point the script to the installed executable:
+
+```sh
+DRAWIO_BIN="/Applications/draw.io.app/Contents/MacOS/draw.io" bash diagrams/export.sh
+```
+
+The script exports pages 1–3 as light-theme SVG at scale 1 and PNG at scale 2,
+using the page-size setting and embedding diagram data. SVG fonts are not
+embedded. Its temporary application profile is separate from the normal editor
+profile; `DRAWIO_PROFILE_DIR` can specify another temporary directory.
+The source and all six exports must be reviewed and committed together after
+changes. Layout details can depend on the draw.io version and available fonts;
+check the rendered images for clipped labels and connector alignment.
 
 ## Implementation Status and Review
 

@@ -58,7 +58,7 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="uc-boundary" value="Farm Direct Procurement System" style="rounded=0;whiteSpace=wrap;html=0;verticalAlign=top;align=left;spacingTop=12;spacingLeft=15;fillColor=white;strokeColor=#526A7C;fontColor=#24384A;fontSize=23;fontStyle=1;dashed=0;" vertex="1" parent="1">
+        <mxCell id="uc-boundary" value="Farm Direct Procurement System" style="rounded=0;whiteSpace=wrap;html=0;verticalAlign=top;align=left;spacingTop=12;spacingLeft=15;fillColor=white;strokeColor=#526A7C;fontColor=#24384A;fontSize=23;fontStyle=1;dashed=0;spacingTop=2;fontSize=21;" vertex="1" parent="1">
           <mxGeometry as="geometry" x="270" y="110" width="1150" height="900" />
         </mxCell>
         <mxCell id="buyer-browse" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;strokeColor=#526A7C;strokeWidth=2;fontColor=#24384A;fontSize=17;labelBackgroundColor=white;endArrow=none;exitX=1.0;exitY=0.4461538461538462;exitDx=0;exitDy=0;entryX=0.0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="uc-buyer" target="browse">
@@ -390,25 +390,25 @@
         <mxCell id="api" value="API routes and schemas&#10;Validation / access checks" style="shape=component;whiteSpace=wrap;html=0;strokeColor=#526A7C;fillColor=white;fontColor=#24384A;fontSize=21;fontFamily=Helvetica;spacing=10;" vertex="1" parent="1">
           <mxGeometry as="geometry" x="590" y="510" width="420" height="90" />
         </mxCell>
-        <mxCell id="identity" value="Identity and access&#10;Accounts / roles / ownership" style="shape=component;whiteSpace=wrap;html=0;strokeColor=#526A7C;fillColor=white;fontColor=#24384A;fontSize=18;fontFamily=Helvetica;spacing=10;" vertex="1" parent="1">
+        <mxCell id="identity" value="Identity and access&#10;Accounts / roles / ownership" style="shape=component;whiteSpace=wrap;html=0;strokeColor=#526A7C;fillColor=white;fontColor=#24384A;fontSize=18;fontFamily=Helvetica;spacing=10;fontSize=16;spacingLeft=20;spacingRight=10;" vertex="1" parent="1">
           <mxGeometry as="geometry" x="80" y="670" width="260" height="110" />
         </mxCell>
-        <mxCell id="catalog" value="Catalog and offers&#10;Product types / farm offers" style="shape=component;whiteSpace=wrap;html=0;strokeColor=#526A7C;fillColor=white;fontColor=#24384A;fontSize=18;fontFamily=Helvetica;spacing=10;" vertex="1" parent="1">
+        <mxCell id="catalog" value="Catalog and offers&#10;Product types / farm offers" style="shape=component;whiteSpace=wrap;html=0;strokeColor=#526A7C;fillColor=white;fontColor=#24384A;fontSize=18;fontFamily=Helvetica;spacing=10;fontSize=16;spacingLeft=20;spacingRight=10;" vertex="1" parent="1">
           <mxGeometry as="geometry" x="370" y="670" width="260" height="110" />
         </mxCell>
-        <mxCell id="procurement" value="Procurement&#10;Orders / stock commitments" style="shape=component;whiteSpace=wrap;html=0;strokeColor=#526A7C;fillColor=white;fontColor=#24384A;fontSize=18;fontFamily=Helvetica;spacing=10;" vertex="1" parent="1">
+        <mxCell id="procurement" value="Procurement&#10;Orders / stock commitments" style="shape=component;whiteSpace=wrap;html=0;strokeColor=#526A7C;fillColor=white;fontColor=#24384A;fontSize=18;fontFamily=Helvetica;spacing=10;fontSize=16;spacingLeft=20;spacingRight=10;" vertex="1" parent="1">
           <mxGeometry as="geometry" x="660" y="670" width="260" height="110" />
         </mxCell>
-        <mxCell id="pricing" value="Pricing and history&#10;Quotes / accepted terms" style="shape=component;whiteSpace=wrap;html=0;strokeColor=#526A7C;fillColor=white;fontColor=#24384A;fontSize=18;fontFamily=Helvetica;spacing=10;" vertex="1" parent="1">
+        <mxCell id="pricing" value="Pricing and history&#10;Quotes / accepted terms" style="shape=component;whiteSpace=wrap;html=0;strokeColor=#526A7C;fillColor=white;fontColor=#24384A;fontSize=18;fontFamily=Helvetica;spacing=10;fontSize=16;spacingLeft=20;spacingRight=10;" vertex="1" parent="1">
           <mxGeometry as="geometry" x="950" y="670" width="260" height="110" />
         </mxCell>
-        <mxCell id="moderation" value="Moderation&#10;Restrictions / decision log" style="shape=component;whiteSpace=wrap;html=0;strokeColor=#526A7C;fillColor=white;fontColor=#24384A;fontSize=18;fontFamily=Helvetica;spacing=10;" vertex="1" parent="1">
+        <mxCell id="moderation" value="Moderation&#10;Restrictions / decision log" style="shape=component;whiteSpace=wrap;html=0;strokeColor=#526A7C;fillColor=white;fontColor=#24384A;fontSize=18;fontFamily=Helvetica;spacing=10;fontSize=16;spacingLeft=20;spacingRight=10;" vertex="1" parent="1">
           <mxGeometry as="geometry" x="1240" y="670" width="260" height="110" />
         </mxCell>
         <mxCell id="repository" value="Persistence / transaction boundary&#10;Repositories, stock reservation, historical writes" style="shape=component;whiteSpace=wrap;html=0;strokeColor=#526A7C;fillColor=white;fontColor=#24384A;fontSize=21;fontFamily=Helvetica;spacing=10;" vertex="1" parent="1">
           <mxGeometry as="geometry" x="500" y="865" width="600" height="100" />
         </mxCell>
-        <mxCell id="database" value="PostgreSQL — planned&#10;Users / farms / products / offers / orders&#10;Price changes / moderation / request keys" style="shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=22;spacingTop=28;whiteSpace=wrap;html=0;strokeColor=#526A7C;fillColor=#EAF2F9;fontColor=#24384A;fontSize=20;fontFamily=Helvetica;spacing=10;" vertex="1" parent="1">
+        <mxCell id="database" value="PostgreSQL — planned&#10;Users / farms / products / offers / orders&#10;Price changes / moderation / request keys" style="shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=22;spacingTop=28;whiteSpace=wrap;html=0;strokeColor=#526A7C;fillColor=#EAF2F9;fontColor=#24384A;fontSize=20;fontFamily=Helvetica;spacing=10;spacingTop=0;spacingBottom=12;" vertex="1" parent="1">
           <mxGeometry as="geometry" x="455" y="1090" width="690" height="145" />
         </mxCell>
         <mxCell id="current-note" value="CURRENT IMPLEMENTATION (separate local path)&#10;Flutter UI → OrderStore → OrderPersistence → shared_preferences JSON&#10;Accounts, catalog, orders and history are stored on one device; there is no shared backend." style="rounded=1;arcSize=10;whiteSpace=wrap;html=0;strokeColor=#526A7C;fillColor=#FFF7E8;fontColor=#24384A;fontSize=19;fontFamily=Helvetica;spacing=10;" vertex="1" parent="1">
