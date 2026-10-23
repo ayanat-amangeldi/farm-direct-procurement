@@ -26,6 +26,13 @@ orders, awaiting/confirmed/all filters and order confirmation. Confirming an
 awaiting order preserves its agreed terms and updates the buyer's local history.
 The farm selector demonstrates roles; it is not authentication.
 
+Under Manage products, farmers can publish an offer for an existing product type
+or create a new product type. They can edit price, total stock, minimum quantity,
+pickup region, product details and delivery availability/fee. The buyer catalog
+uses those saved offers immediately. Stock already committed to orders cannot be
+removed, and existing orders keep their accepted prices. Custom product types use
+neutral image placeholders. These changes remain local to this device/browser.
+
 [Prototype walkthrough and limitations](docs/prototype/catalog-and-offers.md)
 
 ## Run the Flutter Client
@@ -61,6 +68,6 @@ flutter test
 [YouTrack FARM project](https://farm-direct-procurement.youtrack.cloud/projects/FARM)
 
 The buyer prototype is tracked in FARM-8; farmer/admin prototype work is tracked
-in FARM-9. The current farmer increment covers incoming orders and confirmation;
-offer management and administrator screens remain future work. Each implementation stage is
+in FARM-9. The current farmer increment covers incoming orders, confirmation and offer
+management; administrator screens remain future work. Each implementation stage is
 developed on a task branch and submitted for review.

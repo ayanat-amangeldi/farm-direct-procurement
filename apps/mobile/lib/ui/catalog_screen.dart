@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../catalog/demo_catalog.dart';
 import '../catalog/models.dart';
 import '../orders/order_store.dart';
 import 'offers_screen.dart';
@@ -17,7 +16,6 @@ class CatalogScreen extends StatefulWidget {
 
 class _CatalogScreenState extends State<CatalogScreen> {
   final _search = TextEditingController();
-  final _catalog = const DemoCatalog();
   ProductCategory? _category;
 
   @override
@@ -35,7 +33,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
   Widget build(BuildContext context) {
     final store = OrderScope.of(context);
     final query = _search.text.trim().toLowerCase();
-    final products = DemoCatalog.products
+    final products = store.products
         .where(
           (product) =>
               (_category == null || product.category == _category) &&
@@ -218,7 +216,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                   ),
                                 ),
                                 Text(
-                                  '${products.length} products',
+                                  '${products.length} ${products.length == 1 ? 'product' : 'products'}',
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: muted,
@@ -255,7 +253,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                             index,
                           ) {
                             final product = products[index];
-                            final offers = _catalog
+                            final offers = store
                                 .offersFor(product.id)
                                 .where(
                                   (offer) =>

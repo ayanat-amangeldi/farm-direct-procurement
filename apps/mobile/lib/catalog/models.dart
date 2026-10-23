@@ -12,6 +12,28 @@ class Product {
   final String name;
   final String description;
   final ProductCategory category;
+
+  Map<String, Object> toJson() => {
+    'id': id,
+    'name': name,
+    'description': description,
+    'category': category.name,
+  };
+  factory Product.fromJson(Map<String, dynamic> json) {
+    final product = Product(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      description: json['description'] as String,
+      category: ProductCategory.values.byName(json['category'] as String),
+    );
+    if (product.id.isEmpty ||
+        product.name.trim().length < 2 ||
+        product.name.length > 60 ||
+        product.description.length > 160) {
+      throw const FormatException('Invalid saved product.');
+    }
+    return product;
+  }
 }
 
 class FarmProfile {
@@ -36,6 +58,7 @@ class FarmerOffer {
     required this.availableKg,
     required this.minimumKg,
     required this.deliveryFee,
+    this.description = '',
   });
 
   final String id;
@@ -49,6 +72,51 @@ class FarmerOffer {
   final int minimumKg;
   // Null means pickup only; zero would mean free delivery.
   final int? deliveryFee;
+  final String description;
+
+  Map<String, Object?> toJson() => {
+    'id': id,
+    'productId': productId,
+    'farmId': farmId,
+    'farmName': farmName,
+    'location': location,
+    'pricePerKg': pricePerKg,
+    'availableKg': availableKg,
+    'minimumKg': minimumKg,
+    'deliveryFee': deliveryFee,
+    'description': description,
+  };
+
+  factory FarmerOffer.fromJson(Map<String, dynamic> json) {
+    final fee = json['deliveryFee'] as int?;
+    final offer = FarmerOffer(
+      id: json['id'] as String,
+      productId: json['productId'] as String,
+      farmId: json['farmId'] as String,
+      farmName: json['farmName'] as String,
+      location: json['location'] as String,
+      pricePerKg: json['pricePerKg'] as int,
+      availableKg: json['availableKg'] as int,
+      minimumKg: json['minimumKg'] as int,
+      deliveryFee: fee,
+      description: json['description'] as String? ?? '',
+    );
+    if (offer.id.isEmpty ||
+        offer.pricePerKg <= 0 ||
+        offer.pricePerKg > 10000000 ||
+        offer.availableKg < 0 ||
+        offer.availableKg > 1000000 ||
+        offer.minimumKg <= 0 ||
+        offer.minimumKg > 1000000 ||
+        (offer.availableKg > 0 && offer.minimumKg > offer.availableKg) ||
+        (fee != null && (fee < 0 || fee > 10000000)) ||
+        offer.location.trim().length < 2 ||
+        offer.location.length > 100 ||
+        offer.description.length > 500) {
+      throw const FormatException('Invalid saved farmer offer.');
+    }
+    return offer;
+  }
 
   String? quantityError(int? kg) {
     if (kg == null || kg <= 0) return 'Enter a whole number greater than zero.';
