@@ -41,6 +41,15 @@
         <mxCell id="context-note" value="The current prototype operates on one device. Shared server operation is planned.&#10;Payments and courier services are not integrated in the initial scope." style="rounded=1;arcSize=10;whiteSpace=wrap;html=0;strokeColor=#526A7C;fillColor=#FFF7E8;fontColor=#24384A;fontSize=19;fontFamily=Helvetica;spacing=10;" vertex="1" parent="1">
           <mxGeometry as="geometry" x="170" y="790" width="1160" height="95" />
         </mxCell>
+        <mxCell id="context-figure-title" value="Figure 7.1. System context" style="text;html=0;whiteSpace=wrap;overflow=visible;align=center;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#24384A;fontSize=29;fontFamily=Helvetica;fontStyle=1;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="20" y="14" width="1460" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="context-figure-subtitle" value="Target shared system — external roles and system boundary" style="text;html=0;whiteSpace=wrap;overflow=visible;align=center;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#526A7C;fontSize=17;fontFamily=Helvetica;fontStyle=0;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="20" y="60" width="1460" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="context-arrow-explanation" value="Arrows represent interactions initiated by each role; information is returned by the system." style="text;html=0;whiteSpace=wrap;overflow=visible;align=center;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#526A7C;fontSize=18;fontFamily=Helvetica;fontStyle=0;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="722" width="1340" height="42" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
@@ -210,6 +219,21 @@
         </mxCell>
         <mxCell id="uc-note" value="Authentication and role / ownership checks are preconditions for protected actions (FR-01–03).&#10;«include» means every order placement includes calculation and disclosure of the total." style="rounded=1;arcSize=10;whiteSpace=wrap;html=0;strokeColor=#526A7C;fillColor=#F8FAFC;fontColor=#24384A;fontSize=17;fontFamily=Helvetica;spacing=10;" vertex="1" parent="1">
           <mxGeometry as="geometry" x="270" y="1035" width="1150" height="75" />
+        </mxCell>
+        <mxCell id="use-cases-figure-title" value="Figure 7.2. Use case diagram" style="text;html=0;whiteSpace=wrap;overflow=visible;align=center;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#24384A;fontSize=29;fontFamily=Helvetica;fontStyle=1;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="20" y="14" width="1440" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="use-cases-figure-subtitle" value="Core user goals — UML actors, system boundary and use cases" style="text;html=0;whiteSpace=wrap;overflow=visible;align=center;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#526A7C;fontSize=17;fontFamily=Helvetica;fontStyle=0;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="20" y="60" width="1440" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-buyer-workflow-heading" value="BUYER WORKFLOWS" style="text;html=0;whiteSpace=wrap;overflow=visible;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#526A7C;fontSize=16;fontFamily=Helvetica;fontStyle=1;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="295" y="146" width="650" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-farmer-workflow-heading" value="FARMER WORKFLOWS" style="text;html=0;whiteSpace=wrap;overflow=visible;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#526A7C;fontSize=16;fontFamily=Helvetica;fontStyle=1;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="295" y="464" width="650" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-admin-workflow-heading" value="ADMINISTRATOR WORKFLOWS" style="text;html=0;whiteSpace=wrap;overflow=visible;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#526A7C;fontSize=16;fontFamily=Helvetica;fontStyle=1;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="295" y="784" width="650" height="32" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
@@ -389,6 +413,12 @@
         </mxCell>
         <mxCell id="current-note" value="CURRENT IMPLEMENTATION (separate local path)&#10;Flutter UI → OrderStore → OrderPersistence → shared_preferences JSON&#10;Accounts, catalog, orders and history are stored on one device; there is no shared backend." style="rounded=1;arcSize=10;whiteSpace=wrap;html=0;strokeColor=#526A7C;fillColor=#FFF7E8;fontColor=#24384A;fontSize=19;fontFamily=Helvetica;spacing=10;" vertex="1" parent="1">
           <mxGeometry as="geometry" x="90" y="1270" width="1420" height="95" />
+        </mxCell>
+        <mxCell id="components-figure-title" value="Figure 7.3. Component diagram (draft)" style="text;html=0;whiteSpace=wrap;overflow=visible;align=center;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#24384A;fontSize=29;fontFamily=Helvetica;fontStyle=1;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="20" y="14" width="1560" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="components-figure-subtitle" value="Proposed modular monolith — FastAPI / PostgreSQL / REST are not yet connected" style="text;html=0;whiteSpace=wrap;overflow=visible;align=center;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#526A7C;fontSize=17;fontFamily=Helvetica;fontStyle=0;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="20" y="60" width="1560" height="28" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
