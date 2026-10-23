@@ -5,7 +5,8 @@ enum OrderStatus {
   confirmed('Confirmed'),
   ready('Ready'),
   completed('Completed'),
-  cancelled('Cancelled');
+  cancelled('Cancelled'),
+  rejected('Rejected');
 
   const OrderStatus(this.label);
   final String label;
@@ -57,6 +58,11 @@ class ProcurementOrder {
     required this.note,
     required this.status,
     this.confirmedAt,
+    this.readyAt,
+    this.completedAt,
+    this.rejectedAt,
+    this.cancelledAt,
+    this.rejectionReason = '',
   });
 
   final String id;
@@ -77,36 +83,63 @@ class ProcurementOrder {
   final String note;
   final OrderStatus status;
   final DateTime? confirmedAt;
+  final DateTime? readyAt;
+  final DateTime? completedAt;
+  final DateTime? rejectedAt;
+  final DateTime? cancelledAt;
+  final String rejectionReason;
 
   int get subtotal => quantityKg * unitPrice;
   int get total => subtotal + deliveryFee;
   bool get canCancel => status == OrderStatus.pending;
 
-  ProcurementOrder cancelled() => _withStatus(OrderStatus.cancelled);
+  bool get isActive =>
+      status == OrderStatus.pending ||
+      status == OrderStatus.confirmed ||
+      status == OrderStatus.ready;
+  bool get canReject =>
+      status == OrderStatus.pending || status == OrderStatus.confirmed;
+
+  ProcurementOrder cancelled(DateTime at) =>
+      _withStatus(OrderStatus.cancelled, at: at);
+  ProcurementOrder markedReady(DateTime at) =>
+      _withStatus(OrderStatus.ready, at: at);
+  ProcurementOrder completed(DateTime at) =>
+      _withStatus(OrderStatus.completed, at: at);
+  ProcurementOrder rejected(DateTime at, String reason) =>
+      _withStatus(OrderStatus.rejected, at: at, reason: reason);
   ProcurementOrder confirmed(DateTime at) =>
       _withStatus(OrderStatus.confirmed, at: at);
 
-  ProcurementOrder _withStatus(OrderStatus next, {DateTime? at}) =>
-      ProcurementOrder(
-        id: id,
-        createdAt: createdAt,
-        productId: productId,
-        productName: productName,
-        offerId: offerId,
-        farmId: farmId,
-        farmName: farmName,
-        farmRegion: farmRegion,
-        quantityKg: quantityKg,
-        unitPrice: unitPrice,
-        delivery: delivery,
-        deliveryFee: deliveryFee,
-        contactName: contactName,
-        phone: phone,
-        address: address,
-        note: note,
-        status: next,
-        confirmedAt: at ?? confirmedAt,
-      );
+  ProcurementOrder _withStatus(
+    OrderStatus next, {
+    DateTime? at,
+    String? reason,
+  }) => ProcurementOrder(
+    id: id,
+    createdAt: createdAt,
+    productId: productId,
+    productName: productName,
+    offerId: offerId,
+    farmId: farmId,
+    farmName: farmName,
+    farmRegion: farmRegion,
+    quantityKg: quantityKg,
+    unitPrice: unitPrice,
+    delivery: delivery,
+    deliveryFee: deliveryFee,
+    contactName: contactName,
+    phone: phone,
+    address: address,
+    note: note,
+    status: next,
+    confirmedAt: next == OrderStatus.confirmed ? at : confirmedAt,
+    readyAt: next == OrderStatus.ready ? at : readyAt,
+    completedAt: next == OrderStatus.completed ? at : completedAt,
+    rejectedAt: next == OrderStatus.rejected ? at : rejectedAt,
+    cancelledAt: next == OrderStatus.cancelled ? at : cancelledAt,
+    rejectionReason: reason ?? rejectionReason,
+  );
 
   Map<String, Object?> toJson() => {
     'id': id,
@@ -127,9 +160,16 @@ class ProcurementOrder {
     'note': note,
     'status': status.name,
     'confirmedAt': confirmedAt?.toUtc().toIso8601String(),
+    'readyAt': readyAt?.toUtc().toIso8601String(),
+    'completedAt': completedAt?.toUtc().toIso8601String(),
+    'rejectedAt': rejectedAt?.toUtc().toIso8601String(),
+    'cancelledAt': cancelledAt?.toUtc().toIso8601String(),
+    'rejectionReason': rejectionReason,
   };
 
   factory ProcurementOrder.fromJson(Map<String, dynamic> json) {
+    DateTime? date(String key) =>
+        json[key] == null ? null : DateTime.parse(json[key] as String);
     final order = ProcurementOrder(
       id: json['id'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
@@ -148,19 +188,34 @@ class ProcurementOrder {
       address: json['address'] as String,
       note: json['note'] as String,
       status: OrderStatus.values.byName(json['status'] as String),
-      confirmedAt: json['confirmedAt'] == null
-          ? null
-          : DateTime.parse(json['confirmedAt'] as String),
+      confirmedAt: date('confirmedAt'),
+      readyAt: date('readyAt'),
+      completedAt: date('completedAt'),
+      rejectedAt: date('rejectedAt'),
+      cancelledAt: date('cancelledAt'),
+      rejectionReason: json['rejectionReason'] as String? ?? '',
     );
     if (order.id.isEmpty ||
         order.quantityKg <= 0 ||
         order.unitPrice <= 0 ||
         order.deliveryFee < 0 ||
-        (!order.delivery && order.deliveryFee != 0)) {
+        (!order.delivery && order.deliveryFee != 0) ||
+        (order.status == OrderStatus.rejected &&
+            (order.rejectedAt == null ||
+                rejectionReasonError(order.rejectionReason) != null)) ||
+        (order.status != OrderStatus.rejected &&
+            order.rejectionReason.isNotEmpty)) {
       throw const FormatException('Invalid saved demo order.');
     }
     return order;
   }
+}
+
+String? rejectionReasonError(String? value) {
+  final reason = value?.trim() ?? '';
+  return reason.length < 5 || reason.length > 300
+      ? 'Give a reason of 5–300 characters.'
+      : null;
 }
 
 String orderDate(DateTime value) {

@@ -7,7 +7,7 @@ import 'farmer_offers_screen.dart';
 import 'order_widgets.dart';
 import 'shared.dart';
 
-enum FarmerOrdersFilter { pending, confirmed, all }
+enum FarmerOrdersFilter { pending, confirmed, ready, completed, rejected, all }
 
 class FarmerOrdersScreen extends StatefulWidget {
   const FarmerOrdersScreen({super.key});
@@ -36,6 +36,10 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen> {
             FarmerOrdersFilter.pending => order.status == OrderStatus.pending,
             FarmerOrdersFilter.confirmed =>
               order.status == OrderStatus.confirmed,
+            FarmerOrdersFilter.ready => order.status == OrderStatus.ready,
+            FarmerOrdersFilter.completed =>
+              order.status == OrderStatus.completed,
+            FarmerOrdersFilter.rejected => order.status == OrderStatus.rejected,
             FarmerOrdersFilter.all => true,
           },
         )
@@ -130,6 +134,18 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen> {
                 children: [
                   _chip('Awaiting ($pending)', FarmerOrdersFilter.pending),
                   _chip('Confirmed ($confirmed)', FarmerOrdersFilter.confirmed),
+                  _chip(
+                    'Ready (${all.where((o) => o.status == OrderStatus.ready).length})',
+                    FarmerOrdersFilter.ready,
+                  ),
+                  _chip(
+                    'Completed (${all.where((o) => o.status == OrderStatus.completed).length})',
+                    FarmerOrdersFilter.completed,
+                  ),
+                  _chip(
+                    'Rejected (${all.where((o) => o.status == OrderStatus.rejected).length})',
+                    FarmerOrdersFilter.rejected,
+                  ),
                   _chip('All orders', FarmerOrdersFilter.all),
                 ],
               ),

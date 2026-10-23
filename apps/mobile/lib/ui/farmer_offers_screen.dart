@@ -3,6 +3,7 @@ import '../catalog/models.dart';
 import '../orders/order_store.dart';
 import 'offer_editor_screen.dart';
 import 'product_photo.dart';
+import 'price_history_screen.dart';
 import 'shared.dart';
 
 class FarmerOffersScreen extends StatelessWidget {
@@ -171,7 +172,21 @@ class FarmerOffersScreen extends StatelessWidget {
                           ),
                         ),
                       ],
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 8),
+                      TextButton.icon(
+                        key: Key('farmer-price-history-${offer.id}'),
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => PriceHistoryScreen(
+                              offerId: offer.id,
+                              farmId: farm.id,
+                            ),
+                          ),
+                        ),
+                        icon: const Icon(Icons.history, size: 17),
+                        label: const Text('Price history'),
+                      ),
+                      const SizedBox(height: 8),
                       SizedBox(
                         width: double.infinity,
                         child: OutlinedButton.icon(

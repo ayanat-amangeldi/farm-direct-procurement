@@ -130,6 +130,8 @@ class OrderStatusBadge extends StatelessWidget {
     decoration: BoxDecoration(
       color: status == OrderStatus.pending
           ? const Color(0xFFFFF3D7)
+          : status == OrderStatus.rejected
+          ? const Color(0xFFFFEEEB)
           : status == OrderStatus.cancelled
           ? const Color(0xFFF0F1F2)
           : const Color(0xFFE6F2EA),
@@ -142,6 +144,8 @@ class OrderStatusBadge extends StatelessWidget {
         fontWeight: FontWeight.w600,
         color: status == OrderStatus.pending
             ? const Color(0xFF866115)
+            : status == OrderStatus.rejected
+            ? const Color(0xFF9D3F35)
             : status == OrderStatus.cancelled
             ? muted
             : forest,

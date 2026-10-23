@@ -5,6 +5,7 @@ import '../orders/order.dart';
 import '../orders/order_store.dart';
 import 'checkout_screen.dart';
 import 'price_preview.dart';
+import 'price_history_screen.dart';
 import 'product_photo.dart';
 import 'shared.dart';
 
@@ -153,11 +154,16 @@ class _OffersScreenState extends State<OffersScreen> {
                         children: [
                           const Icon(Icons.sort, size: 17, color: muted),
                           const SizedBox(width: 5),
-                          Text(
-                            _sort == OfferSort.price
-                                ? 'Lowest unit price'
-                                : 'Farm name',
-                            style: const TextStyle(fontSize: 12, color: muted),
+                          Flexible(
+                            child: Text(
+                              _sort == OfferSort.price
+                                  ? 'Lowest unit price'
+                                  : 'Farm name',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: muted,
+                              ),
+                            ),
                           ),
                           const Icon(
                             Icons.keyboard_arrow_down,
@@ -316,7 +322,18 @@ class _OfferCard extends StatelessWidget {
               ? 'Pickup only · no delivery fee'
               : 'Pickup free · delivery ${money(offer.deliveryFee!)}',
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 8),
+        TextButton.icon(
+          key: Key('price-history-${offer.id}'),
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => PriceHistoryScreen(offerId: offer.id),
+            ),
+          ),
+          icon: const Icon(Icons.history, size: 17),
+          label: const Text('Price history'),
+        ),
+        const SizedBox(height: 10),
         SizedBox(
           width: double.infinity,
           child: FilledButton(
@@ -325,7 +342,9 @@ class _OfferCard extends StatelessWidget {
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('View offer'),
+                Flexible(
+                  child: Text('View offer', textAlign: TextAlign.center),
+                ),
                 SizedBox(width: 8),
                 Icon(Icons.arrow_forward, size: 16),
               ],
