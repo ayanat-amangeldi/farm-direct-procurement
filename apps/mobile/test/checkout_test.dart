@@ -1,3 +1,4 @@
+import 'auth_helpers.dart';
 import 'package:farm_direct/main.dart';
 import 'package:farm_direct/orders/order.dart';
 import 'package:farm_direct/orders/order_store.dart';
@@ -40,7 +41,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     final persistence = MemoryOrderPersistence();
-    final store = OrderStore(persistence: persistence);
+    final store = await buyerStore(OrderStore(persistence: persistence));
     await tester.pumpWidget(FarmDirectApp(orderStore: store));
     await tester.pumpAndSettle();
     await openPotatoes(tester);
@@ -99,7 +100,7 @@ void main() {
 
     // Rebuild with a fresh store, as after relaunching the application.
     await tester.pumpWidget(const SizedBox());
-    final restored = await OrderStore.restore(persistence);
+    final restored = await buyerStore(await OrderStore.restore(persistence));
     await tester.pumpWidget(FarmDirectApp(orderStore: restored));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('open-orders')));
@@ -117,7 +118,9 @@ void main() {
   testWidgets('empty order history offers a way back to products', (
     tester,
   ) async {
-    await tester.pumpWidget(const FarmDirectApp());
+    await tester.pumpWidget(
+      FarmDirectApp(orderStore: await buyerStore(OrderStore())),
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('open-orders')));
     await tester.pumpAndSettle();

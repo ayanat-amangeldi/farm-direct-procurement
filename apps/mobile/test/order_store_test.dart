@@ -1,3 +1,4 @@
+import 'auth_helpers.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:farm_direct/catalog/demo_catalog.dart';
@@ -17,16 +18,24 @@ Future<ProcurementOrder> place(
   String phone = '+7 700 000 00 00',
   String address = 'Demo city, Sample Street 1',
   FarmerOffer? selectedOffer,
-}) => store.place(
-  product: product,
-  offer: selectedOffer ?? offer,
-  kg: kg,
-  delivery: delivery,
-  contactName: name,
-  phone: phone,
-  address: address,
-  note: 'Sample order',
-);
+}) async {
+  final previous = store.currentUser?.email;
+  await demoLogin(store);
+  final order = await store.place(
+    product: product,
+    offer: selectedOffer ?? offer,
+    kg: kg,
+    delivery: delivery,
+    contactName: name,
+    phone: phone,
+    address: address,
+    note: 'Sample order',
+  );
+  if (previous != null && previous != 'buyer@farm.demo') {
+    await demoLogin(store, previous);
+  }
+  return order;
+}
 
 class FailingPersistence extends MemoryOrderPersistence {
   @override
@@ -48,7 +57,9 @@ void main() {
     () async {
       final persistence = MemoryOrderPersistence();
       final time = DateTime.utc(2026, 10, 23, 8, 30);
-      final store = OrderStore(persistence: persistence, now: () => time);
+      final store = await buyerStore(
+        OrderStore(persistence: persistence, now: () => time),
+      );
       final order = await place(store);
       expect(order.total, 12000);
       expect(order.unitPrice, 190);
@@ -56,7 +67,7 @@ void main() {
       expect(order.createdAt, time);
       expect(order.status, OrderStatus.pending);
       expect(store.availableKg(offer), 750);
-      final restored = await OrderStore.restore(persistence);
+      final restored = await buyerStore(await OrderStore.restore(persistence));
       expect(restored.orders.single.toJson(), order.toJson());
       expect(restored.availableKg(offer), 750);
       expect(restored.sessionOnly, isFalse);
@@ -71,7 +82,7 @@ void main() {
   test(
     'orders cannot oversell and cancellation releases stock without changing price',
     () async {
-      final store = OrderStore();
+      final store = await buyerStore(OrderStore());
       final order = await place(store, kg: 760);
       expect(store.availableKg(offer), 40);
       await expectLater(place(store), throwsA(isA<OrderException>()));
@@ -90,7 +101,9 @@ void main() {
   test(
     'a storage failure creates neither an order nor a stock reservation',
     () async {
-      final store = OrderStore(persistence: FailingPersistence());
+      final store = await buyerStore(
+        OrderStore(persistence: FailingPersistence()),
+      );
       await expectLater(place(store), throwsA(isA<OrderException>()));
       expect(store.orders, isEmpty);
       expect(store.availableKg(offer), 800);
@@ -103,7 +116,7 @@ void main() {
     'concurrent clicks cannot write duplicate orders or lose a reservation',
     () async {
       final persistence = DelayedPersistence();
-      final store = OrderStore(persistence: persistence);
+      final store = await buyerStore(OrderStore(persistence: persistence));
       final first = place(store);
       await expectLater(place(store), throwsA(isA<OrderException>()));
       expect(store.orders, isEmpty);
@@ -117,7 +130,7 @@ void main() {
   test(
     'invalid contact, fulfillment and mismatched product are rejected',
     () async {
-      final store = OrderStore();
+      final store = await buyerStore(OrderStore());
       for (final attempt in [
         () => place(store, name: ' '),
         () => place(store, phone: 'abc'),
@@ -136,10 +149,10 @@ void main() {
     'failed cancellation retains the existing order and reserved stock',
     () async {
       final memory = MemoryOrderPersistence();
-      final initial = OrderStore(persistence: memory);
+      final initial = await buyerStore(OrderStore(persistence: memory));
       final order = await place(initial);
       final failing = FailingPersistence()..value = memory.value;
-      final store = await OrderStore.restore(failing);
+      final store = await buyerStore(await OrderStore.restore(failing));
       await expectLater(store.cancel(order.id), throwsA(isA<OrderException>()));
       expect(store.find(order.id)!.status, OrderStatus.pending);
       expect(store.availableKg(offer), 750);
@@ -151,7 +164,7 @@ void main() {
     'unreadable, unknown-version or duplicate history is never overwritten',
     () async {
       final good = MemoryOrderPersistence();
-      await place(OrderStore(persistence: good));
+      await place(await buyerStore(OrderStore(persistence: good)));
       final data = jsonDecode(good.value!) as Map<String, dynamic>;
       final order = (data['orders'] as List).single;
       for (final raw in [

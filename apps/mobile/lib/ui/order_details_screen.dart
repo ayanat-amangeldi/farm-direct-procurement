@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../auth/account.dart';
 import '../orders/order.dart';
 import '../orders/order_store.dart';
 import 'order_widgets.dart';
@@ -59,7 +60,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final candidate = OrderScope.of(context).find(widget.orderId);
-    final farmerView = widget.farmId != null;
+    final farmerView =
+        widget.farmId != null &&
+        OrderScope.of(context).currentUser?.role == AccountRole.farmer;
     final order =
         farmerView &&
             (widget.farmId!.isEmpty || candidate?.farmId != widget.farmId)
@@ -245,7 +248,10 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                         order: order,
                         farmId: widget.farmId!,
                       ),
-                    if (!farmerView && order.canCancel) ...[
+                    if (!farmerView &&
+                        order.canCancel &&
+                        OrderScope.of(context).currentUser?.role ==
+                            AccountRole.buyer) ...[
                       const SizedBox(height: 22),
                       OutlinedButton(
                         key: const Key('cancel-order'),

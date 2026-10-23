@@ -1,3 +1,4 @@
+import 'auth_helpers.dart';
 import 'dart:convert';
 import 'package:farm_direct/catalog/demo_catalog.dart';
 import 'package:farm_direct/main.dart';
@@ -15,7 +16,9 @@ void main() {
     () async {
       final persistence = MemoryOrderPersistence();
       var now = DateTime.utc(2026, 10, 23, 10);
-      final store = OrderStore(persistence: persistence, now: () => now);
+      final store = await farmerStore(
+        OrderStore(persistence: persistence, now: () => now),
+      );
       final order = await place(store);
       final remaining = store.availableKg(DemoCatalog.offers[2]);
       now = now.add(const Duration(minutes: 5));
@@ -33,7 +36,7 @@ void main() {
           ..remove('confirmedAt'),
       );
       expect(store.availableKg(DemoCatalog.offers[2]), remaining);
-      final restored = await OrderStore.restore(persistence);
+      final restored = await farmerStore(await OrderStore.restore(persistence));
       expect(restored.find(order.id)!.toJson(), confirmed.toJson());
       await expectLater(
         restored.cancel(order.id),
@@ -47,7 +50,7 @@ void main() {
   );
 
   test('farms see and confirm only their own awaiting orders', () async {
-    final store = OrderStore();
+    final store = await farmerStore(OrderStore());
     final order = await place(store);
     final other = await place(
       store,
@@ -55,9 +58,10 @@ void main() {
       selectedOffer: DemoCatalog.offers.first,
     );
     expect(store.ordersForFarm('bereke').map((order) => order.id), [order.id]);
-    expect(store.ordersForFarm('saryarka').map((order) => order.id), [
-      other.id,
-    ]);
+    expect(store.ordersForFarm('saryarka'), isEmpty);
+    await demoLogin(store, 'saryarka@farm.demo');
+    expect(store.ordersForFarm('saryarka').single.id, other.id);
+    await demoLogin(store, 'bereke@farm.demo');
     expect(store.ordersForFarm(''), isEmpty);
     for (final id in ['', 'saryarka', 'unknown']) {
       await expectLater(
@@ -70,6 +74,7 @@ void main() {
       throwsA(isA<OrderException>()),
     );
     expect(store.find(order.id)!.status, OrderStatus.pending);
+    await demoLogin(store);
     await store.cancel(order.id);
     await expectLater(
       store.confirm(order.id, farmId: 'bereke'),
@@ -81,9 +86,11 @@ void main() {
     'failed confirmation leaves pending state, terms and saved data unchanged',
     () async {
       final memory = MemoryOrderPersistence();
-      final order = await place(OrderStore(persistence: memory));
+      final order = await place(
+        await farmerStore(OrderStore(persistence: memory)),
+      );
       final failing = FailingPersistence()..value = memory.value;
-      final store = await OrderStore.restore(failing);
+      final store = await farmerStore(await OrderStore.restore(failing));
       await expectLater(
         store.confirm(order.id, farmId: 'bereke'),
         throwsA(isA<OrderException>()),
@@ -97,9 +104,11 @@ void main() {
     'confirmation wins a concurrent cancellation without lost updates',
     () async {
       final memory = MemoryOrderPersistence();
-      final order = await place(OrderStore(persistence: memory));
+      final order = await place(
+        await farmerStore(OrderStore(persistence: memory)),
+      );
       final delayed = DelayedPersistence()..value = memory.value;
-      final store = await OrderStore.restore(delayed);
+      final store = await farmerStore(await OrderStore.restore(delayed));
       final confirmation = store.confirm(order.id, farmId: 'bereke');
       await expectLater(store.cancel(order.id), throwsA(isA<OrderException>()));
       delayed.gate.complete();
@@ -112,7 +121,9 @@ void main() {
     'legacy history resolves ownership by known offer ID without erasing orders',
     () async {
       final memory = MemoryOrderPersistence();
-      final order = await place(OrderStore(persistence: memory));
+      final order = await place(
+        await farmerStore(OrderStore(persistence: memory)),
+      );
       final legacy = order.toJson()
         ..remove('farmId')
         ..remove('confirmedAt');
@@ -120,7 +131,7 @@ void main() {
         'version': 1,
         'orders': [legacy],
       });
-      final restored = await OrderStore.restore(memory);
+      final restored = await farmerStore(await OrderStore.restore(memory));
       expect(restored.ordersForFarm('bereke').single.id, order.id);
       await restored.confirm(order.id, farmId: 'bereke');
       expect(restored.find(order.id)!.total, 12000);
@@ -129,7 +140,8 @@ void main() {
         'version': 1,
         'orders': [legacy],
       });
-      final unknown = await OrderStore.restore(memory);
+      final unknown = await farmerStore(await OrderStore.restore(memory));
+      await demoLogin(unknown);
       expect(unknown.orders, hasLength(1));
       expect(unknown.ordersForFarm('bereke'), isEmpty);
       expect(unknown.ordersForFarm(''), isEmpty);
@@ -148,7 +160,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       final persistence = MemoryOrderPersistence();
-      final store = OrderStore(persistence: persistence);
+      final store = await farmerStore(OrderStore(persistence: persistence));
       final order = await place(store);
       final other = await place(
         store,
@@ -157,7 +169,8 @@ void main() {
       );
       await tester.pumpWidget(FarmDirectApp(orderStore: store));
       await tester.pumpAndSettle();
-      await tapVisible(tester, find.byKey(const Key('open-farmer-workspace')));
+      await demoLogin(store, 'bereke@farm.demo');
+      await tester.pumpAndSettle();
       expect(find.text('Awaiting (1)'), findsOneWidget);
       expect(find.byKey(Key('farmer-order-${other.id}')), findsNothing);
       await tapVisible(tester, find.byKey(Key('farmer-order-${order.id}')));
@@ -176,15 +189,7 @@ void main() {
       await tester.pumpAndSettle();
       await tapVisible(tester, find.text('Confirmed (1)'));
       await reveal(tester, find.byKey(Key('farmer-order-${order.id}')));
-      await tester.scrollUntilVisible(
-        find.byKey(const Key('farmer-selector')),
-        -200,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('farmer-selector')));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Saryarka Farm').last);
+      await demoLogin(store, 'saryarka@farm.demo');
       await tester.pumpAndSettle();
       await tapVisible(tester, find.text('Awaiting (1)'));
       expect(find.byKey(Key('farmer-order-${order.id}')), findsNothing);
@@ -192,7 +197,8 @@ void main() {
       expect(tester.takeException(), isNull);
 
       await tester.pumpWidget(const SizedBox());
-      final restored = await OrderStore.restore(persistence);
+      final restored = await farmerStore(await OrderStore.restore(persistence));
+      await demoLogin(restored);
       await tester.pumpWidget(FarmDirectApp(orderStore: restored));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('open-orders')));
@@ -220,22 +226,20 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       await tester.pumpWidget(
-        const MaterialApp(
+        MaterialApp(
           home: MediaQuery(
-            data: MediaQueryData(
+            data: const MediaQueryData(
               size: Size(320, 720),
               textScaler: TextScaler.linear(1.5),
             ),
-            child: FarmDirectApp(),
+            child: FarmDirectApp(orderStore: await farmerStore(OrderStore())),
           ),
         ),
       );
       await tester.pumpAndSettle();
-      await tapVisible(tester, find.byKey(const Key('open-farmer-workspace')));
       await reveal(tester, find.text('No orders for this farm yet'));
       expect(tester.takeException(), isNull);
-      await tapVisible(tester, find.text('Back to buyer catalog'));
-      expect(find.byKey(const Key('catalog-search')), findsOneWidget);
+
       expect(tester.takeException(), isNull);
     },
   );

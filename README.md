@@ -21,13 +21,13 @@ open local order history, inspect saved price terms, and cancel an order that is
 awaiting confirmation. Orders survive a restart on the same device/browser;
 there is no shared server inventory or real payment.
 
-The Farmer workspace entry opens a demo farm selector, farm-specific incoming
-orders, awaiting/confirmed/all filters and order confirmation. Confirming an
+Signing in as a farmer opens farm-specific incoming orders, status filters and
+order confirmation. Confirming an
 awaiting order preserves its agreed terms and updates the buyer's local history.
 Farmers can mark confirmed orders ready for pickup/delivery, then completed.
 They can reject awaiting or confirmed orders with a required reason visible to
 the buyer. Rejection releases local stock; completion keeps it consumed. The
-farm selector demonstrates roles; it is not authentication.
+signed-in farmer can manage only their own farm.
 
 Under Manage products, farmers can publish an offer for an existing product type
 or create a new product type. They can edit price, total stock, minimum quantity,
@@ -38,6 +38,27 @@ neutral image placeholders. Buyers and farmers can open Price history to inspect
 dated unit-price and delivery-fee changes. Only successful publications and
 price/fee edits are recorded; earlier history is not invented. These changes
 remain local to this device/browser.
+
+The app now starts with local sign-in and buyer/farmer registration. Registration
+creates an independent buyer history or a new farm; it never grants administrator
+access. Logout clears the navigation stack. Accounts, farms, offers and orders
+persist together, but sessions do not: sign in again after restarting. Older demo
+orders belong to the seeded Demo Buyer account.
+
+Demo credentials (fictional, shared password `FarmDemo2026!`):
+
+| Role | Email |
+| --- | --- |
+| Buyer | `buyer@farm.demo` |
+| Farmer — Bereke | `bereke@farm.demo` |
+| Administrator | `admin@farm.demo` |
+
+The sign-in screen also lists the other four fixture farmer accounts. Passwords
+are stored as salted PBKDF2-HMAC-SHA256 hashes (100,000 iterations), using
+[cryptography](https://pub.dev/packages/cryptography). This is a local prototype,
+not server authentication: device/browser data can be inspected or changed by its
+owner. Use sample data and a demo password. There is no email verification,
+password recovery, real payment, backend authorization or cross-device sync.
 
 [Prototype walkthrough and limitations](docs/prototype/catalog-and-offers.md)
 
@@ -74,6 +95,7 @@ flutter test
 [YouTrack FARM project](https://farm-direct-procurement.youtrack.cloud/projects/FARM)
 
 The buyer prototype is tracked in FARM-8; farmer/admin prototype work is tracked
-in FARM-9. The current farmer increment covers incoming orders, confirmation and offer
-management; administrator screens remain future work. Each implementation stage is
+in FARM-9. The current farmer increment covers incoming orders, the full order lifecycle and
+offer management. A read-only administrator dashboard provides account, offer and
+order oversight; account blocking and listing moderation remain future work. Each implementation stage is
 developed on a task branch and submitted for review.

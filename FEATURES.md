@@ -27,3 +27,11 @@
 •⁠  ⁠Manage user accounts
 •⁠  ⁠Moderate product listings
 •⁠  ⁠Monitor orders and transactions
+
+## Prototype implementation status
+
+Local buyer/farmer registration, sign-in and role-specific workspaces are
+implemented. Each farmer owns one farm; buyers see their own orders. Seeded demo
+administrators have read-only account, offer and order oversight. Production
+authentication, account management, listing moderation and transaction monitoring
+still require backend implementation.
