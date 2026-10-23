@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../catalog/demo_catalog.dart';
+import 'account_bar.dart';
 import '../orders/order.dart';
 import '../orders/order_store.dart';
 import 'order_details_screen.dart';
@@ -16,14 +16,19 @@ class FarmerOrdersScreen extends StatefulWidget {
 }
 
 class _FarmerOrdersScreenState extends State<FarmerOrdersScreen> {
-  String _farmId = 'bereke';
   FarmerOrdersFilter _filter = FarmerOrdersFilter.pending;
 
   @override
   Widget build(BuildContext context) {
     final store = OrderScope.of(context);
-    final farm = DemoCatalog.farms.firstWhere((farm) => farm.id == _farmId);
-    final all = store.ordersForFarm(_farmId);
+    final farm = store.currentFarm;
+    if (farm == null) {
+      return const Scaffold(
+        body: Center(child: Text('Farmer account required.')),
+      );
+    }
+    final farmId = farm.id;
+    final all = store.ordersForFarm(farmId);
     final pending = all
         .where((order) => order.status == OrderStatus.pending)
         .length;
@@ -69,29 +74,17 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen> {
               ),
               const SizedBox(height: 10),
               const Text(
-                'Demo farmer view · same device as the buyer. Switch farms to test their orders; sign-in is not connected.',
+                'Manage orders for your farm. Only orders placed with your farm appear here.',
                 style: TextStyle(fontSize: 13, color: muted, height: 1.5),
               ),
               const SizedBox(height: 22),
-              DropdownButtonFormField<String>(
-                key: const Key('farmer-selector'),
-                initialValue: _farmId,
-                isExpanded: true,
-                decoration: const InputDecoration(labelText: 'Demo farm'),
-                items: [
-                  for (final profile in DemoCatalog.farms)
-                    DropdownMenuItem(
-                      value: profile.id,
-                      child: Text(
-                        profile.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                ],
-                onChanged: (id) {
-                  if (id != null) setState(() => _farmId = id);
-                },
+              const AccountBar(),
+              Text(
+                farm.name,
+                style: const TextStyle(
+                  fontSize: 21,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               const SizedBox(height: 10),
               Text(
@@ -108,7 +101,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen> {
                 ),
                 icon: const Icon(Icons.inventory_2_outlined, size: 18),
                 label: Text(
-                  'Manage products (${store.farmOffers(_farmId).length})',
+                  'Manage products (${store.farmOffers(farmId).length})',
                 ),
               ),
               const SizedBox(height: 20),
@@ -185,13 +178,6 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen> {
                               setState(() => _filter = FarmerOrdersFilter.all),
                           child: const Text('Show all farm orders'),
                         ),
-                      TextButton.icon(
-                        onPressed: () => Navigator.of(
-                          context,
-                        ).popUntil((route) => route.isFirst),
-                        icon: const Icon(Icons.storefront_outlined, size: 18),
-                        label: const Text('Back to buyer catalog'),
-                      ),
                     ],
                   ),
                 )
@@ -205,7 +191,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen> {
                       MaterialPageRoute<void>(
                         builder: (_) => OrderDetailsScreen(
                           orderId: order.id,
-                          farmId: _farmId,
+                          farmId: farmId,
                         ),
                       ),
                     ),

@@ -27,3 +27,13 @@
 •⁠  ⁠Manage user accounts
 •⁠  ⁠Moderate product listings
 •⁠  ⁠Monitor orders and transactions
+
+## Prototype implementation status
+
+Local buyer/farmer registration, sign-in and role-specific workspaces are
+implemented. Each farmer owns one farm; buyers see their own orders. Seeded demo
+administrators can block/unblock buyers and farmers, hide/restore individual
+offers with reasons, and review orders and moderation history. Blocked farmer
+offers are excluded from the buyer catalog; existing orders remain intact.
+Production authentication, trusted moderation enforcement and transaction
+monitoring still require backend implementation.

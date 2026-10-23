@@ -1,3 +1,4 @@
+import 'auth_helpers.dart';
 import 'dart:convert';
 import 'package:farm_direct/catalog/models.dart';
 import 'package:farm_direct/catalog/offer_draft.dart';
@@ -60,12 +61,13 @@ void main() {
     'new product and farm offer persist together and can be ordered',
     () async {
       final persistence = MemoryOrderPersistence();
-      final store = OrderStore(persistence: persistence);
+      final store = await farmerStore(OrderStore(persistence: persistence));
       final offer = await store.saveOffer(farmId: 'bereke', draft: draft());
       final product = store.product(offer.productId)!;
       expect(product.name, 'Onions');
       expect(store.products, hasLength(7));
       expect(store.offersFor(product.id).single.id, offer.id);
+      await demoLogin(store);
       final order = await store.place(
         product: product,
         offer: offer,
@@ -77,11 +79,12 @@ void main() {
         note: '',
       );
       expect(order.total, 2900);
-      final restored = await OrderStore.restore(persistence);
+      final restored = await farmerStore(await OrderStore.restore(persistence));
       expect(restored.product(product.id)!.toJson(), product.toJson());
       expect(restored.offer(offer.id)!.toJson(), offer.toJson());
       expect(restored.availableKg(restored.offer(offer.id)!), 90);
       expect(restored.find(order.id)!.total, 2900);
+      await demoLogin(restored, 'bereke@farm.demo');
       final next = await restored.saveOffer(
         farmId: 'bereke',
         draft: draft(name: 'Pumpkins'),
@@ -94,7 +97,7 @@ void main() {
   test(
     'existing types join the same catalog group; duplicate farm offers are rejected',
     () async {
-      final store = OrderStore();
+      final store = await farmerStore(OrderStore());
       final offer = await store.saveOffer(
         farmId: 'bereke',
         draft: draft(productId: 'tomatoes', price: 410),
@@ -124,7 +127,7 @@ void main() {
   test(
     'editing changes future quotes but preserves ordered terms and committed stock',
     () async {
-      final store = OrderStore();
+      final store = await farmerStore(OrderStore());
       final order = await place(store);
       final before = store.find(order.id)!.toJson();
       final old = store.offer('potato-3')!;
@@ -158,6 +161,7 @@ void main() {
         throwsA(isA<OrderException>()),
       );
       expect(store.offer(old.id)!.availableKg, 100);
+      await demoLogin(store);
       await store.cancel(order.id);
       expect(store.availableKg(updated), 80);
     },
@@ -166,7 +170,7 @@ void main() {
   test(
     'invalid drafts, another farm and changed product identity cannot mutate catalog',
     () async {
-      final store = OrderStore();
+      final store = await farmerStore(OrderStore());
       for (final invalid in [
         draft(price: 0),
         draft(stock: -1),
@@ -216,9 +220,11 @@ void main() {
     'failed publication creates neither a product nor an offer and keeps stored history',
     () async {
       final memory = MemoryOrderPersistence();
-      final order = await place(OrderStore(persistence: memory));
+      final order = await place(
+        await farmerStore(OrderStore(persistence: memory)),
+      );
       final failing = FailingPersistence()..value = memory.value;
-      final store = await OrderStore.restore(failing);
+      final store = await farmerStore(await OrderStore.restore(failing));
       await expectLater(
         store.saveOffer(farmId: 'bereke', draft: draft()),
         throwsA(isA<OrderException>()),
@@ -232,7 +238,7 @@ void main() {
 
   test('catalog updates and checkout share a write lock', () async {
     final persistence = DelayedPersistence();
-    final store = OrderStore(persistence: persistence);
+    final store = await farmerStore(OrderStore(persistence: persistence));
     final saving = store.saveOffer(
       farmId: 'bereke',
       offerId: 'potato-3',
@@ -249,15 +255,15 @@ void main() {
     'version-one history migrates without losing orders; invalid catalogs stay untouched',
     () async {
       final memory = MemoryOrderPersistence();
-      final order = await place(OrderStore());
+      final order = await place(await farmerStore(OrderStore()));
       memory.value = jsonEncode({
         'version': 1,
         'orders': [order.toJson()],
       });
-      final migrated = await OrderStore.restore(memory);
+      final migrated = await farmerStore(await OrderStore.restore(memory));
       expect(migrated.products, hasLength(6));
       await migrated.saveOffer(farmId: 'bereke', draft: draft());
-      final restored = await OrderStore.restore(memory);
+      final restored = await farmerStore(await OrderStore.restore(memory));
       expect(restored.products, hasLength(7));
       expect(restored.find(order.id)!.total, order.total);
       final malformed = jsonDecode(memory.value!) as Map<String, dynamic>;
@@ -280,11 +286,12 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       final memory = MemoryOrderPersistence();
-      final store = OrderStore(persistence: memory);
+      final store = await farmerStore(OrderStore(persistence: memory));
       final oldOrder = await place(store);
       await tester.pumpWidget(FarmDirectApp(orderStore: store));
       await tester.pumpAndSettle();
-      await tap(tester, find.byKey(const Key('open-farmer-workspace')));
+      await demoLogin(store, 'bereke@farm.demo');
+      await tester.pumpAndSettle();
       await tap(tester, find.byKey(const Key('manage-farmer-products')));
       await tap(tester, find.byKey(const Key('add-farmer-product')));
       await tap(tester, find.byKey(const Key('save-farmer-offer')));
@@ -323,9 +330,7 @@ void main() {
       await tap(tester, find.byKey(const Key('save-farmer-offer')));
       expect(store.offer(offer.id)!.pricePerKg, 240);
       expect(store.find(oldOrder.id)!.total, 12000);
-      await tester.pageBack();
-      await tester.pumpAndSettle();
-      await tester.pageBack();
+      await demoLogin(store);
       await tester.pumpAndSettle();
       await reach(tester, find.byKey(const Key('catalog-search')), delta: -200);
       await tester.enterText(find.byKey(const Key('catalog-search')), 'onions');
@@ -344,7 +349,8 @@ void main() {
       expect(tester.takeException(), isNull);
 
       await tester.pumpWidget(const SizedBox());
-      final restored = await OrderStore.restore(memory);
+      final restored = await farmerStore(await OrderStore.restore(memory));
+      await demoLogin(restored);
       await tester.pumpWidget(FarmDirectApp(orderStore: restored));
       await tester.pumpAndSettle();
       await tester.enterText(find.byKey(const Key('catalog-search')), 'onions');
@@ -362,7 +368,7 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-    final store = OrderStore();
+    final store = await farmerStore(OrderStore());
     await tester.pumpWidget(
       MaterialApp(
         home: MediaQuery(
@@ -375,7 +381,8 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    await tap(tester, find.byKey(const Key('open-farmer-workspace')));
+    await demoLogin(store, 'bereke@farm.demo');
+    await tester.pumpAndSettle();
     await tap(tester, find.byKey(const Key('manage-farmer-products')));
     await tap(tester, find.byKey(const Key('add-farmer-product')));
     for (final entry in {

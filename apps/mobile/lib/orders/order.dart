@@ -41,6 +41,7 @@ String? addressError(String? value) {
 class ProcurementOrder {
   const ProcurementOrder({
     required this.id,
+    this.buyerId = 'demo-buyer',
     required this.createdAt,
     required this.productId,
     required this.productName,
@@ -66,6 +67,7 @@ class ProcurementOrder {
   });
 
   final String id;
+  final String buyerId;
   final DateTime createdAt;
   final String productId;
   final String productName;
@@ -117,6 +119,7 @@ class ProcurementOrder {
     String? reason,
   }) => ProcurementOrder(
     id: id,
+    buyerId: buyerId,
     createdAt: createdAt,
     productId: productId,
     productName: productName,
@@ -143,6 +146,7 @@ class ProcurementOrder {
 
   Map<String, Object?> toJson() => {
     'id': id,
+    'buyerId': buyerId,
     'createdAt': createdAt.toUtc().toIso8601String(),
     'productId': productId,
     'productName': productName,
@@ -172,6 +176,7 @@ class ProcurementOrder {
         json[key] == null ? null : DateTime.parse(json[key] as String);
     final order = ProcurementOrder(
       id: json['id'] as String,
+      buyerId: json['buyerId'] as String? ?? 'demo-buyer',
       createdAt: DateTime.parse(json['createdAt'] as String),
       productId: json['productId'] as String,
       productName: json['productName'] as String,

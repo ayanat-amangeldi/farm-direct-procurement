@@ -129,6 +129,26 @@ class FarmerOffersScreen extends StatelessWidget {
                           ),
                         ],
                       ),
+                      if (store.isOfferHidden(offer.id)) ...[
+                        const SizedBox(height: 16),
+                        Text(
+                          'Hidden by administrator: ${store.offerRestriction(offer.id)!.reason}',
+                          key: Key('offer-moderation-${offer.id}'),
+                          style: const TextStyle(
+                            color: Color(0xFFAA3030),
+                            fontSize: 13,
+                            height: 1.5,
+                          ),
+                        ),
+                        const Text(
+                          'You can edit this offer, but only an administrator can restore its visibility.',
+                          style: TextStyle(
+                            color: muted,
+                            fontSize: 12,
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: 16),
                       Text(
                         '${store.availableKg(offer)} kg available · minimum ${offer.minimumKg} kg',

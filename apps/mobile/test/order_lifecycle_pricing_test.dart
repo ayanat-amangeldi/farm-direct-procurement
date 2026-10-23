@@ -1,3 +1,4 @@
+import 'auth_helpers.dart';
 import 'dart:convert';
 import 'package:farm_direct/catalog/demo_catalog.dart';
 import 'package:farm_direct/main.dart';
@@ -30,7 +31,9 @@ void main() {
       for (final delivery in [false, true]) {
         final memory = MemoryOrderPersistence();
         var time = DateTime.utc(2026, 10, 23, 10);
-        final store = OrderStore(persistence: memory, now: () => time);
+        final store = await farmerStore(
+          OrderStore(persistence: memory, now: () => time),
+        );
         final order = await place(store, delivery: delivery);
         final expectedTerms = terms(order);
         time = time.add(const Duration(minutes: 1));
@@ -49,7 +52,7 @@ void main() {
         expect(saved.isActive, isFalse);
         expect(terms(saved), expectedTerms);
         expect(store.availableKg(DemoCatalog.offers[2]), 750);
-        final restored = await OrderStore.restore(memory);
+        final restored = await farmerStore(await OrderStore.restore(memory));
         expect(restored.find(order.id)!.toJson(), saved.toJson());
       }
     },
@@ -58,7 +61,7 @@ void main() {
   test(
     'cannot skip stages, act for another farm or reopen terminal orders',
     () async {
-      final store = OrderStore();
+      final store = await farmerStore(OrderStore());
       final order = await place(store);
       for (final action in [
         () => store.markReady(order.id, farmId: 'bereke'),
@@ -110,7 +113,7 @@ void main() {
     () async {
       for (final confirmed in [false, true]) {
         final memory = MemoryOrderPersistence();
-        final store = OrderStore(persistence: memory);
+        final store = await farmerStore(OrderStore(persistence: memory));
         final order = await place(store);
         if (confirmed) await store.confirm(order.id, farmId: 'bereke');
         await store.reject(
@@ -130,7 +133,7 @@ void main() {
           store.reject(order.id, farmId: 'bereke', reason: 'Other reason'),
           throwsA(isA<OrderException>()),
         );
-        final restored = await OrderStore.restore(memory);
+        final restored = await farmerStore(await OrderStore.restore(memory));
         expect(restored.find(order.id)!.toJson(), rejected.toJson());
       }
     },
@@ -145,7 +148,7 @@ void main() {
         OrderStatus.ready,
       ]) {
         final memory = MemoryOrderPersistence();
-        final initial = OrderStore(persistence: memory);
+        final initial = await farmerStore(OrderStore(persistence: memory));
         final order = await place(initial);
         if (source != OrderStatus.pending) {
           await initial.confirm(order.id, farmId: 'bereke');
@@ -154,7 +157,7 @@ void main() {
           await initial.markReady(order.id, farmId: 'bereke');
         }
         final failing = FailingPersistence()..value = memory.value;
-        final store = await OrderStore.restore(failing);
+        final store = await farmerStore(await OrderStore.restore(failing));
         final before = store.find(order.id)!.toJson();
         final action = switch (source) {
           OrderStatus.pending => store.reject(
@@ -177,11 +180,11 @@ void main() {
     'a concurrent rejection cannot overwrite a successful readiness change',
     () async {
       final memory = MemoryOrderPersistence();
-      final initial = OrderStore(persistence: memory);
+      final initial = await farmerStore(OrderStore(persistence: memory));
       final order = await place(initial);
       await initial.confirm(order.id, farmId: 'bereke');
       final delayed = DelayedPersistence()..value = memory.value;
-      final store = await OrderStore.restore(delayed);
+      final store = await farmerStore(await OrderStore.restore(delayed));
       final ready = store.markReady(order.id, farmId: 'bereke');
       await expectLater(
         store.reject(order.id, farmId: 'bereke', reason: 'No available stock'),
@@ -199,7 +202,9 @@ void main() {
     () async {
       final memory = MemoryOrderPersistence();
       var time = DateTime.utc(2026, 10, 23, 10);
-      final store = OrderStore(persistence: memory, now: () => time);
+      final store = await farmerStore(
+        OrderStore(persistence: memory, now: () => time),
+      );
       final order = await place(store);
       expect(store.priceHistoryFor('potato-3'), isEmpty);
       await store.saveOffer(
@@ -233,7 +238,7 @@ void main() {
       final published = await store.saveOffer(farmId: 'bereke', draft: draft());
       expect(store.priceHistoryFor(published.id).single.published, isTrue);
       expect(store.find(order.id)!.total, 12000);
-      final restored = await OrderStore.restore(memory);
+      final restored = await farmerStore(await OrderStore.restore(memory));
       expect(
         restored
             .priceHistoryFor('potato-3')
@@ -242,7 +247,7 @@ void main() {
         store.priceHistoryFor('potato-3').map((item) => item.toJson()).toList(),
       );
       final failing = FailingPersistence()..value = memory.value;
-      final failed = await OrderStore.restore(failing);
+      final failed = await farmerStore(await OrderStore.restore(failing));
       await expectLater(
         failed.saveOffer(
           farmId: 'bereke',
@@ -261,13 +266,13 @@ void main() {
     'old saves acquire no invented price dates and invalid history remains untouched',
     () async {
       final memory = MemoryOrderPersistence();
-      final initial = OrderStore(persistence: memory);
+      final initial = await farmerStore(OrderStore(persistence: memory));
       final order = await place(initial);
       final legacy = jsonDecode(memory.value!) as Map<String, dynamic>;
       legacy['version'] = 2;
       legacy.remove('priceHistory');
       memory.value = jsonEncode(legacy);
-      final store = await OrderStore.restore(memory);
+      final store = await farmerStore(await OrderStore.restore(memory));
       expect(store.priceHistoryFor('potato-3'), isEmpty);
       expect(store.find(order.id)!.total, 12000);
       await store.saveOffer(
@@ -295,11 +300,12 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       final memory = MemoryOrderPersistence();
-      final store = OrderStore(persistence: memory);
+      final store = await farmerStore(OrderStore(persistence: memory));
       final order = await place(store, delivery: false);
       await tester.pumpWidget(FarmDirectApp(orderStore: store));
       await tester.pumpAndSettle();
-      await tap(tester, find.byKey(const Key('open-farmer-workspace')));
+      await demoLogin(store, 'bereke@farm.demo');
+      await tester.pumpAndSettle();
       await tap(tester, find.byKey(Key('farmer-order-${order.id}')));
       for (final action in [
         ('confirm-farmer-order', 'Confirm order'),
@@ -313,7 +319,8 @@ void main() {
       expect(store.find(order.id)!.status, OrderStatus.completed);
       expect(find.byKey(const Key('complete-farmer-order')), findsNothing);
       await tester.pumpWidget(const SizedBox());
-      final restored = await OrderStore.restore(memory);
+      final restored = await farmerStore(await OrderStore.restore(memory));
+      await demoLogin(restored);
       await tester.pumpWidget(FarmDirectApp(orderStore: restored));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('open-orders')));
@@ -338,11 +345,12 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
-      final store = OrderStore();
+      final store = await farmerStore(OrderStore());
       final order = await place(store);
       await tester.pumpWidget(FarmDirectApp(orderStore: store));
       await tester.pumpAndSettle();
-      await tap(tester, find.byKey(const Key('open-farmer-workspace')));
+      await demoLogin(store, 'bereke@farm.demo');
+      await tester.pumpAndSettle();
       await tap(tester, find.byKey(Key('farmer-order-${order.id}')));
       await tap(tester, find.byKey(const Key('reject-farmer-order')));
       await tester.tap(find.widgetWithText(FilledButton, 'Reject order'));
@@ -357,9 +365,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(store.find(order.id)!.status, OrderStatus.rejected);
       expect(store.availableKg(DemoCatalog.offers[2]), 800);
-      await tester.pageBack();
-      await tester.pumpAndSettle();
-      await tester.pageBack();
+      await demoLogin(store);
       await tester.pumpAndSettle();
       await tap(tester, find.byKey(const Key('open-orders')), delta: -200);
       await tap(tester, find.byKey(Key('order-${order.id}')));
@@ -377,7 +383,7 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
-      final store = OrderStore();
+      final store = await farmerStore(OrderStore());
       await store.saveOffer(
         farmId: 'bereke',
         offerId: 'potato-3',
@@ -388,6 +394,7 @@ void main() {
         offerId: 'potato-3',
         draft: draft(productId: 'potatoes', price: 220, fee: 0),
       );
+      await demoLogin(store);
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
@@ -409,11 +416,8 @@ void main() {
       await tester.pumpAndSettle();
       await tester.pageBack();
       await tester.pumpAndSettle();
-      await tap(
-        tester,
-        find.byKey(const Key('open-farmer-workspace')),
-        delta: -200,
-      );
+      await demoLogin(store, 'bereke@farm.demo');
+      await tester.pumpAndSettle();
       await tap(tester, find.byKey(const Key('manage-farmer-products')));
       await tap(tester, find.byKey(const Key('farmer-price-history-potato-3')));
       await reach(tester, find.byKey(const Key('history-current-price')));

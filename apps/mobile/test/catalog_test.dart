@@ -1,4 +1,6 @@
+import 'auth_helpers.dart';
 import 'package:farm_direct/main.dart';
+import 'package:farm_direct/orders/order_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -29,7 +31,9 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-    await tester.pumpWidget(const FarmDirectApp());
+    await tester.pumpWidget(
+      FarmDirectApp(orderStore: await buyerStore(OrderStore())),
+    );
     await tester.pumpAndSettle();
   }
 
@@ -172,7 +176,7 @@ void main() {
             size: Size(320, 720),
             textScaler: TextScaler.linear(1.5),
           ),
-          child: const FarmDirectApp(),
+          child: FarmDirectApp(orderStore: await buyerStore(OrderStore())),
         ),
       ),
     );

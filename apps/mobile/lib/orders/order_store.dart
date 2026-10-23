@@ -4,6 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart';
 
 import '../catalog/models.dart';
+import '../auth/account.dart';
+import '../admin/moderation.dart';
 import '../catalog/offer_draft.dart';
 import '../catalog/price_change.dart';
 import '../catalog/demo_catalog.dart';
@@ -38,6 +40,230 @@ class OrderStore extends ChangeNotifier {
   }) : _persistence = persistence ?? MemoryOrderPersistence(),
        _now = now ?? DateTime.now;
 
+  List<DemoAccount> _accounts = List.of(demoAccounts);
+  List<FarmProfile> _farms = List.of(DemoCatalog.farms);
+  DemoAccount? _currentUser;
+  bool _authenticating = false;
+  DemoAccount? get currentUser =>
+      _currentUser == null || isAccountBlocked(_currentUser!.id)
+      ? null
+      : _currentUser;
+  List<ModerationRecord> _moderation = [];
+  List<ModerationRecord> get moderationHistory =>
+      currentUser?.role == AccountRole.admin
+      ? List.unmodifiable(_moderation.reversed)
+      : const [];
+  ModerationRecord? accountRestriction(String id) =>
+      _latestRestriction(ModerationTarget.account, id);
+  ModerationRecord? offerRestriction(String id) =>
+      _latestRestriction(ModerationTarget.offer, id);
+  ModerationRecord? _latestRestriction(ModerationTarget target, String id) {
+    for (final record in _moderation.reversed) {
+      if (record.target == target && record.targetId == id) return record;
+    }
+    return null;
+  }
+
+  bool isAccountBlocked(String id) =>
+      accountRestriction(id)?.restricted ?? false;
+  bool isOfferHidden(String id) => offerRestriction(id)?.restricted ?? false;
+  bool isFarmBlocked(String farmId) =>
+      _accounts.any((a) => a.farmId == farmId && isAccountBlocked(a.id));
+  bool isOfferVisible(FarmerOffer selected) =>
+      !isOfferHidden(selected.id) && !isFarmBlocked(selected.farmId);
+  List<Product> get catalogProducts =>
+      List.unmodifiable(_products.where((p) => offersFor(p.id).isNotEmpty));
+
+  Future<void> setAccountBlocked(
+    String id, {
+    required bool blocked,
+    required String reason,
+  }) async {
+    _requireRole(AccountRole.admin);
+    final account = _accounts.where((a) => a.id == id).firstOrNull;
+    if (account == null || account.role == AccountRole.admin) {
+      throw const OrderException(
+        'Administrator accounts are protected. Select a buyer or farmer.',
+      );
+    }
+    if (isAccountBlocked(id) == blocked) {
+      throw const OrderException(
+        'This account status has already changed. Refresh the list.',
+      );
+    }
+    await _moderate(ModerationTarget.account, id, blocked, reason);
+  }
+
+  Future<void> setOfferHidden(
+    String id, {
+    required bool hidden,
+    required String reason,
+  }) async {
+    _requireRole(AccountRole.admin);
+    if (offer(id) == null) {
+      throw const OrderException('This offer is no longer available.');
+    }
+    if (isOfferHidden(id) == hidden) {
+      throw const OrderException(
+        'This offer status has already changed. Refresh the list.',
+      );
+    }
+    await _moderate(ModerationTarget.offer, id, hidden, reason);
+  }
+
+  Future<void> _moderate(
+    ModerationTarget target,
+    String id,
+    bool restricted,
+    String reason,
+  ) async {
+    final error = moderationReasonError(reason);
+    if (error != null) throw OrderException(error);
+    await _save(
+      _orders,
+      moderation: [
+        ..._moderation,
+        ModerationRecord(
+          target: target,
+          targetId: id,
+          restricted: restricted,
+          reason: reason.trim(),
+          at: _now(),
+          adminId: currentUser!.id,
+        ),
+      ],
+    );
+  }
+
+  List<DemoAccount> get accounts => currentUser?.role == AccountRole.admin
+      ? List.unmodifiable(_accounts)
+      : const [];
+  FarmProfile? get currentFarm {
+    for (final farm in _farms) {
+      if (farm.id == currentUser?.farmId) return farm;
+    }
+    return null;
+  }
+
+  void _idle() {
+    if (_writing || _authenticating) {
+      throw const OrderException(
+        'Another change is being saved. Please try again.',
+      );
+    }
+  }
+
+  void _requireRole(AccountRole role, {String? farmId}) {
+    _idle();
+    if (currentUser?.role != role ||
+        (farmId != null && currentUser?.farmId != farmId)) {
+      throw const OrderException(
+        'Your account does not have permission for this action.',
+      );
+    }
+  }
+
+  Future<void> signIn(String email, String password) async {
+    _idle();
+    _authenticating = true;
+    try {
+      final normalized = email.trim().toLowerCase();
+      // Always derive a hash, including when the address is unknown.
+      final selected = _accounts
+          .where((a) => a.email == normalized)
+          .firstOrNull;
+      final valid = await (selected ?? demoAccounts.first).verifies(password);
+      if (!valid || selected == null) {
+        throw const OrderException('Email or password is incorrect.');
+      }
+      if (isAccountBlocked(selected.id)) {
+        throw OrderException(
+          'This account is blocked. ${accountRestriction(selected.id)!.reason}',
+        );
+      }
+      _currentUser = selected;
+      notifyListeners();
+    } finally {
+      _authenticating = false;
+    }
+  }
+
+  void signOut() {
+    _idle();
+    _currentUser = null;
+    notifyListeners();
+  }
+
+  Future<void> register({
+    required String name,
+    required String email,
+    required String password,
+    required AccountRole role,
+    String farmName = '',
+    String region = '',
+  }) async {
+    _idle();
+    if (currentUser != null) {
+      throw const OrderException('Sign out before creating an account.');
+    }
+    if (role == AccountRole.admin) {
+      throw const OrderException(
+        'Administrator accounts cannot be self-registered.',
+      );
+    }
+    final normalized = email.trim().toLowerCase();
+    if (nameError(name) != null ||
+        emailError(normalized) != null ||
+        passwordError(password) != null) {
+      throw const OrderException('Check your name, email and password.');
+    }
+    if (_accounts.any((a) => a.email == normalized)) {
+      throw const OrderException(
+        'An account already exists for this email. Sign in instead.',
+      );
+    }
+    if (role == AccountRole.farmer &&
+        (farmName.trim().length < 2 ||
+            farmName.trim().length > 80 ||
+            region.trim().length < 2 ||
+            region.trim().length > 100)) {
+      throw const OrderException('Enter a farm name and region.');
+    }
+    _authenticating = true;
+    try {
+      final salt = DemoAccount.newSalt();
+      final hash = await DemoAccount.hash(password, salt);
+      final farmId = role == AccountRole.farmer
+          ? _nextId('farm', _farms.map((f) => f.id))
+          : null;
+      final account = DemoAccount(
+        id: _nextId('account', _accounts.map((a) => a.id)),
+        name: name.trim(),
+        email: normalized,
+        role: role,
+        farmId: farmId,
+        salt: salt,
+        passwordHash: hash,
+      );
+      await _save(
+        _orders,
+        accounts: [..._accounts, account],
+        farms: [
+          ..._farms,
+          if (farmId != null)
+            FarmProfile(
+              id: farmId,
+              name: farmName.trim(),
+              region: region.trim(),
+            ),
+        ],
+        signedIn: account,
+      );
+    } finally {
+      _authenticating = false;
+    }
+  }
+
   final OrderPersistence _persistence;
   final DateTime Function() _now;
   final bool sessionOnly;
@@ -66,8 +292,11 @@ class OrderStore extends ChangeNotifier {
     return null;
   }
 
-  List<FarmerOffer> offersFor(String productId) =>
-      List.unmodifiable(_offers.where((item) => item.productId == productId));
+  List<FarmerOffer> offersFor(String productId) => List.unmodifiable(
+    _offers.where(
+      (item) => item.productId == productId && isOfferVisible(item),
+    ),
+  );
   List<FarmerOffer> farmOffers(String farmId) =>
       List.unmodifiable(_offers.where((item) => item.farmId == farmId));
   int reservedKg(String offerId) => _orders
@@ -80,10 +309,17 @@ class OrderStore extends ChangeNotifier {
       .fold(0, (sum, order) => sum + order.quantityKg);
   bool _writing = false;
 
-  List<ProcurementOrder> get orders => List.unmodifiable(_orders);
+  bool _canRead(ProcurementOrder order) => switch (currentUser?.role) {
+    AccountRole.admin => true,
+    AccountRole.buyer => order.buyerId == currentUser!.id,
+    AccountRole.farmer => order.farmId == currentUser!.farmId,
+    null => false,
+  };
+  List<ProcurementOrder> get orders =>
+      List.unmodifiable(_orders.where(_canRead));
   ProcurementOrder? find(String id) {
     for (final order in _orders) {
-      if (order.id == id) return order;
+      if (order.id == id && _canRead(order)) return order;
     }
     return null;
   }
@@ -93,10 +329,55 @@ class OrderStore extends ChangeNotifier {
     final raw = await persistence.read();
     if (raw == null) return store;
     final data = jsonDecode(raw) as Map<String, dynamic>;
-    if (![1, 2, 3].contains(data['version'])) {
+    if (![1, 2, 3, 4, 5].contains(data['version'])) {
       throw const FormatException('Unsupported order history.');
     }
-    if (data['version'] == 2 || data['version'] == 3) {
+    if ([4, 5].contains(data['version'])) {
+      store._accounts = (data['accounts'] as List)
+          .map(
+            (item) =>
+                DemoAccount.fromJson(Map<String, dynamic>.from(item as Map)),
+          )
+          .toList();
+      store._farms = (data['farms'] as List).map((item) {
+        final map = Map<String, dynamic>.from(item as Map);
+        final farm = FarmProfile(
+          id: map['id'] as String,
+          name: map['name'] as String,
+          region: map['region'] as String,
+        );
+        if (farm.id.isEmpty ||
+            farm.name.trim().length < 2 ||
+            farm.name.length > 80 ||
+            farm.region.trim().length < 2 ||
+            farm.region.length > 100) {
+          throw const FormatException('Invalid saved farm.');
+        }
+        return farm;
+      }).toList();
+      if (store._accounts.map((a) => a.id).toSet().length !=
+              store._accounts.length ||
+          store._accounts.map((a) => a.email).toSet().length !=
+              store._accounts.length ||
+          store._farms.map((f) => f.id).toSet().length != store._farms.length ||
+          !store._accounts.any((a) => a.role == AccountRole.admin) ||
+          store._accounts.any(
+            (a) =>
+                a.role == AccountRole.farmer &&
+                !store._farms.any((f) => f.id == a.farmId),
+          ) ||
+          store._accounts
+                  .where((a) => a.role == AccountRole.farmer)
+                  .map((a) => a.farmId)
+                  .toSet()
+                  .length !=
+              store._accounts
+                  .where((a) => a.role == AccountRole.farmer)
+                  .length) {
+        throw const FormatException('Inconsistent saved accounts.');
+      }
+    }
+    if ([2, 3, 4, 5].contains(data['version'])) {
       if (data['products'] is! List || data['offers'] is! List) {
         throw const FormatException('Missing saved catalog.');
       }
@@ -128,13 +409,16 @@ class OrderStore extends ChangeNotifier {
           store._offers.any(
             (item) =>
                 !productIds.contains(item.productId) ||
-                !DemoCatalog.farms.any((farm) => farm.id == item.farmId),
+                !store._farms.any((farm) => farm.id == item.farmId),
           )) {
         throw const FormatException('Inconsistent saved catalog.');
       }
     }
     store._orders = (data['orders'] as List).map((json) {
       final values = Map<String, dynamic>.from(json as Map);
+      if ([4, 5].contains(data['version']) && values['buyerId'] == null) {
+        throw const FormatException('Missing saved buyer ownership.');
+      }
       // Version-1 orders predate farm IDs. Match known offer IDs only;
       // an unknown offer stays buyer-visible but has no farmer owner.
       if (values['farmId'] == null) {
@@ -152,7 +436,7 @@ class OrderStore extends ChangeNotifier {
         store._orders.length) {
       throw const FormatException('Duplicate order numbers.');
     }
-    if (data['version'] == 3) {
+    if ([3, 4, 5].contains(data['version'])) {
       if (data['priceHistory'] is! List) {
         throw const FormatException('Missing saved price history.');
       }
@@ -170,6 +454,39 @@ class OrderStore extends ChangeNotifier {
         throw const FormatException('Inconsistent saved price history.');
       }
     }
+    if (store._orders.any(
+      (order) => !store._accounts.any(
+        (a) => a.id == order.buyerId && a.role == AccountRole.buyer,
+      ),
+    )) {
+      throw const FormatException('Missing buyer for a saved order.');
+    }
+    if (data['version'] == 5) {
+      if (data['moderation'] is! List) {
+        throw const FormatException('Missing moderation history.');
+      }
+      store._moderation = (data['moderation'] as List)
+          .map(
+            (item) => ModerationRecord.fromJson(
+              Map<String, dynamic>.from(item as Map),
+            ),
+          )
+          .toList();
+      for (final record in store._moderation) {
+        final targetAccount = store._accounts
+            .where((a) => a.id == record.targetId)
+            .firstOrNull;
+        if (!store._accounts.any(
+              (a) => a.id == record.adminId && a.role == AccountRole.admin,
+            ) ||
+            (record.target == ModerationTarget.account
+                ? targetAccount == null ||
+                      targetAccount.role == AccountRole.admin
+                : store.offer(record.targetId) == null)) {
+          throw const FormatException('Inconsistent moderation history.');
+        }
+      }
+    }
     return store;
   }
 
@@ -185,13 +502,14 @@ class OrderStore extends ChangeNotifier {
     required OfferDraft draft,
     String? offerId,
   }) async {
+    _requireRole(AccountRole.farmer, farmId: farmId);
     if (_writing) {
       throw const OrderException(
         'Another change is being saved. Please try again.',
       );
     }
     FarmProfile? farm;
-    for (final profile in DemoCatalog.farms) {
+    for (final profile in _farms) {
       if (profile.id == farmId) farm = profile;
     }
     if (farm == null) throw const OrderException('Select a valid demo farm.');
@@ -309,6 +627,7 @@ class OrderStore extends ChangeNotifier {
     required String address,
     required String note,
   }) async {
+    _requireRole(AccountRole.buyer);
     if (_writing) {
       throw const OrderException(
         'Another change is being saved. Please try again.',
@@ -318,6 +637,11 @@ class OrderStore extends ChangeNotifier {
     if (current == null || !mapEquals(current.toJson(), offer.toJson())) {
       throw const OrderException(
         'This offer has changed. Reopen it to review the latest price and terms.',
+      );
+    }
+    if (!isOfferVisible(current)) {
+      throw const OrderException(
+        'This offer is unavailable. Return to the catalog and choose another farmer.',
       );
     }
     final error = availableQuantityError(offer, kg, availableKg(offer));
@@ -346,6 +670,7 @@ class OrderStore extends ChangeNotifier {
     }
     final order = ProcurementOrder(
       id: 'FD-${sequence.toString().padLeft(4, '0')}',
+      buyerId: currentUser!.id,
       createdAt: _now(),
       productId: product.id,
       productName: product.name,
@@ -369,7 +694,7 @@ class OrderStore extends ChangeNotifier {
 
   List<ProcurementOrder> ordersForFarm(String farmId) => farmId.isEmpty
       ? const []
-      : List.unmodifiable(_orders.where((order) => order.farmId == farmId));
+      : List.unmodifiable(orders.where((order) => order.farmId == farmId));
 
   Future<void> confirm(String id, {required String farmId}) =>
       _farmerTransition(id, farmId: farmId, target: OrderStatus.confirmed);
@@ -399,6 +724,7 @@ class OrderStore extends ChangeNotifier {
         'Another change is being saved. Please try again.',
       );
     }
+    _requireRole(AccountRole.farmer, farmId: farmId);
     final order = find(id);
     if (farmId.isEmpty || order == null || order.farmId != farmId) {
       throw const OrderException(
@@ -433,6 +759,7 @@ class OrderStore extends ChangeNotifier {
   }
 
   Future<void> cancel(String id) async {
+    _requireRole(AccountRole.buyer);
     if (_writing) {
       throw const OrderException(
         'Another change is being saved. Please try again.',
@@ -454,6 +781,10 @@ class OrderStore extends ChangeNotifier {
     List<Product>? products,
     List<FarmerOffer>? offers,
     List<PriceChange>? priceHistory,
+    List<DemoAccount>? accounts,
+    List<FarmProfile>? farms,
+    DemoAccount? signedIn,
+    List<ModerationRecord>? moderation,
   }) async {
     final nextProducts = products ?? _products;
     final nextOffers = offers ?? _offers;
@@ -462,13 +793,24 @@ class OrderStore extends ChangeNotifier {
     try {
       await _persistence.write(
         jsonEncode({
-          'version': 3,
+          'version': 5,
+          'moderation': (moderation ?? _moderation)
+              .map((r) => r.toJson())
+              .toList(),
+          'accounts': (accounts ?? _accounts).map((a) => a.toJson()).toList(),
+          'farms': (farms ?? _farms)
+              .map((f) => {'id': f.id, 'name': f.name, 'region': f.region})
+              .toList(),
           'priceHistory': nextHistory.map((item) => item.toJson()).toList(),
           'products': nextProducts.map((item) => item.toJson()).toList(),
           'offers': nextOffers.map((item) => item.toJson()).toList(),
           'orders': candidate.map((order) => order.toJson()).toList(),
         }),
       );
+      _moderation = moderation ?? _moderation;
+      _accounts = accounts ?? _accounts;
+      _farms = farms ?? _farms;
+      _currentUser = signedIn ?? _currentUser;
       _orders = candidate;
       _products = nextProducts;
       _offers = nextOffers;
