@@ -29,6 +29,34 @@ Headings, lists, tables and hyperlinks are converted to Markdown; the complete
 Word report retains the original layout and figures. Section numbers are retained
 so references to other report sections can be followed in the complete report.
 
+## Team Contribution and Section Coordination
+
+The report was prepared jointly by **Ayanat Amangeldi** and **Dilyara Anetbayeva**,
+as confirmed by the team. The following section coordination follows the existing
+YouTrack assignments. The named student coordinates the corresponding task;
+requirements discussions, integration of the report and review are shared
+activities.
+
+| Report section | Coordinating student | YouTrack task |
+| --- | --- | --- |
+| 1. Project proposal and scope | Ayanat Amangeldi | [FARM-7](https://farm-direct-procurement.youtrack.cloud/issue/FARM-7) |
+| 2. Evidence of relevance | Dilyara Anetbayeva | [FARM-11](https://farm-direct-procurement.youtrack.cloud/issue/FARM-11) |
+| 3. Literature review | Ayanat Amangeldi | [FARM-12](https://farm-direct-procurement.youtrack.cloud/issue/FARM-12) |
+| 4. Existing system comparison | Dilyara Anetbayeva | [FARM-13](https://farm-direct-procurement.youtrack.cloud/issue/FARM-13) |
+| 5. Technology comparison | Ayanat Amangeldi | [FARM-14](https://farm-direct-procurement.youtrack.cloud/issue/FARM-14) |
+| 6. Requirements specification | Ayanat Amangeldi | [FARM-15](https://farm-direct-procurement.youtrack.cloud/issue/FARM-15) |
+| 7. Architecture and diagrams | Ayanat Amangeldi | [FARM-16](https://farm-direct-procurement.youtrack.cloud/issue/FARM-16) |
+| 8. UX / prototype | Dilyara Anetbayeva | [FARM-8](https://farm-direct-procurement.youtrack.cloud/issue/FARM-8), [FARM-9](https://farm-direct-procurement.youtrack.cloud/issue/FARM-9) |
+| 9. Verification and evaluation plan | Dilyara Anetbayeva | [FARM-17](https://farm-direct-procurement.youtrack.cloud/issue/FARM-17) |
+| 10. Project management and risks | Ayanat Amangeldi and Dilyara Anetbayeva | Shared planning; submission coordination in [FARM-19](https://farm-direct-procurement.youtrack.cloud/issue/FARM-19) |
+
+**Repository publication:** Ayanat coordinates copying the supplied report,
+converting the readable sections, validating links and publishing this
+documentation through [FARM-21](https://farm-direct-procurement.youtrack.cloud/issue/FARM-21).
+The publication commit records that repository operation. The other team member's
+review of the publication PR is recorded separately when submitted. Task
+completion remains subject to each task's acceptance criteria.
+
 ## Evidence and Current Status
 
 - The relevance section records reported experiences from two farmers and two
