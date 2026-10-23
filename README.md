@@ -10,6 +10,7 @@ manage account access and offer visibility.
 
 [GitHub repository](https://github.com/ayanat-amangeldi/farm-direct-procurement)
 · [YouTrack project](https://farm-direct-procurement.youtrack.cloud/projects/FARM)
+· [Project documentation and complete English report](docs/README.md)
 · [Prototype walkthrough and screenshots](docs/prototype/catalog-and-offers.md)
 
 ## Problem Statement
@@ -19,10 +20,11 @@ prices, available quantities, minimum orders and delivery terms are presented
 separately. Small farms may also have limited channels for reaching buyers
 directly and managing procurement requests.
 
-These are working problem assumptions from the project justification. Interviews,
-process observations and supporting evidence still need to validate their
-importance for the intended users. Benefits such as reduced comparison time or
-improved price comprehension have not yet been measured.
+Four reported interviews with two farmers and two buyers provide initial
+qualitative evidence of these difficulties; the findings and limitations are
+documented in [Evidence of Relevance](docs/evidence-of-relevance.md). Benefits such
+as reduced comparison time or improved price comprehension have not yet been
+measured.
 
 ## Aim and Objectives
 
@@ -77,10 +79,12 @@ backend and representative-user evaluation are planned outcomes for later stages
 
 ## Scope and Current Status
 
-**As of 23 October 2026:** the local Flutter demonstration prototype is complete
+**As of 24 October 2026:** the local Flutter demonstration prototype is complete
 for its agreed scope and merged into `main`. It targets Android, iOS and web.
-Analysis/design documents and the formal evaluation plan are still being prepared
-for the first pre-defense; the complete submission package is not yet finished.
+The [English report and readable documentation](docs/README.md) cover the initial
+analysis, design and formal evaluation plan. Supervisor feedback and publication
+of the separate editable architecture sources remain outstanding; the complete
+submission package and submission tag are not yet finished.
 
 ### Implemented Prototype Features
 
@@ -137,9 +141,9 @@ and subsequent price/delivery-fee changes; earlier history is not invented.
 | Development tools | Flutter SDK, Android Studio with Flutter/Dart plugins, Xcode and iPhone Simulator on macOS. |
 | Collaboration | Git, GitHub task branches/pull requests and YouTrack. |
 
-Python/FastAPI, PostgreSQL and REST are backend candidates from the project
-justification. They are not connected to this prototype; the final choices and
-alternatives must be documented in the technology comparison.
+Python/FastAPI, PostgreSQL and a REST-style JSON API are the recommended backend
+baseline in the [technology comparison](docs/technology-comparison.md). They are
+not connected to this prototype and still require implementation validation.
 
 ## Repository Structure and Documentation
 
@@ -151,6 +155,10 @@ apps/mobile/
   android/ ios/ web/   Platform project files
   pubspec.yaml         Dependencies and SDK constraints
   pubspec.lock         Resolved dependency versions
+docs/
+  README.md            Documentation index, evidence status and outstanding items
+  report/              Complete supplied English report with diagrams/screenshots
+  *.md                 Readable analysis, requirements and planning sections
 docs/prototype/
   catalog-and-offers.md Buyer, farmer and admin walkthroughs and check results
   image-sources.md     Image provenance and generation prompts
@@ -162,16 +170,24 @@ README.md              Project overview, setup and verification instructions
 
 Available documentation:
 
+- [Documentation index and complete English report](docs/README.md).
+- [Project proposal and scope](docs/project-proposal.md).
+- [Evidence of relevance](docs/evidence-of-relevance.md).
+- [Literature review and source analysis](docs/literature-review.md).
+- [Existing system comparison](docs/existing-system-comparison.md).
+- [Technology comparison](docs/technology-comparison.md).
+- [Requirements and acceptance criteria](docs/requirements-specification.md).
+- [Verification and evaluation plan](docs/verification-and-evaluation-plan.md).
+- [Responsibilities, milestones and risks](docs/project-management-and-risks.md).
 - [System features](FEATURES.md).
 - [Prototype scenarios, expected results, limitations and screenshots](docs/prototype/catalog-and-offers.md).
 - [Image sources and prompts](docs/prototype/image-sources.md).
 
-Outstanding documentation includes the project proposal and scope, evidence of
-user needs, critical literature review, existing-system and technology
-comparisons, prioritised requirements and acceptance criteria, architectural
-diagrams with editable sources, verification/evaluation plan, milestones/risks,
-and recorded supervisor feedback. These are tracked in YouTrack and will be
-added to this repository as they are completed.
+Architecture descriptions and figure exports are included in Section 7 of the
+complete report. Separate editable diagram sources and genuine supervisor
+feedback remain to be published. Interview dates/formats, complete platform
+acceptance and evaluation results also remain to be recorded. The documented
+plans do not establish that the planned backend or evaluation is complete.
 
 ## Setup and Execution
 
@@ -254,8 +270,9 @@ flutter analyze
 flutter test
 ```
 
-Latest recorded implementation checks: **66 tests passed**, analysis reported no
-issues, and the following builds succeeded:
+Latest recorded implementation checks: **66 tests passed**, and analysis reported
+no issues. The following platform builds succeeded earlier in prototype
+development; they were not rerun for the catalog-availability correction in PR #6:
 
 ```sh
 flutter build web --release --no-wasm-dry-run
@@ -263,9 +280,11 @@ flutter build ios --simulator --debug
 ```
 
 Manual browser checks used a 390 × 844 viewport; widget tests include 320 px layouts
-with larger text. An interactive iPhone Simulator walkthrough remains pending;
-a successful Simulator build does not establish runtime usability. Android build
-and device/emulator runtime checks remain pending local SDK-license/device setup.
+with larger text. Section 8 of the complete report contains actual iPhone
+Simulator and desktop web captures. These captures do not complete the full
+platform/accessibility acceptance matrix or representative-user evaluation.
+Android build and device/emulator runtime checks remain pending local
+SDK-license/device setup.
 Representative-user evaluation and backend/security testing have not been run.
 
 ## Project Tracking and Contribution Workflow
@@ -275,8 +294,10 @@ contains task owners, priorities, expected outcomes, acceptance criteria and
 applicable deadlines. Key items are [FARM-1: README](https://farm-direct-procurement.youtrack.cloud/issue/FARM-1),
 [FARM-8: buyer prototype](https://farm-direct-procurement.youtrack.cloud/issue/FARM-8),
 [FARM-9: farmer/admin prototype](https://farm-direct-procurement.youtrack.cloud/issue/FARM-9),
-[FARM-10: pricing and data contract](https://farm-direct-procurement.youtrack.cloud/issue/FARM-10)
-and [FARM-17: verification plan](https://farm-direct-procurement.youtrack.cloud/issue/FARM-17).
+[FARM-10: pricing and data contract](https://farm-direct-procurement.youtrack.cloud/issue/FARM-10),
+[FARM-17: verification plan](https://farm-direct-procurement.youtrack.cloud/issue/FARM-17),
+[FARM-20: catalog availability](https://farm-direct-procurement.youtrack.cloud/issue/FARM-20)
+and [FARM-21: report publication](https://farm-direct-procurement.youtrack.cloud/issue/FARM-21).
 
 Use a task branch such as `codex/FARM-1-complete-readme`, include the task ID in the
 commit or PR description, link the change back to YouTrack, and describe its
