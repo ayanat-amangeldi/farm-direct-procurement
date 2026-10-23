@@ -71,8 +71,13 @@ class OrderStore extends ChangeNotifier {
       _accounts.any((a) => a.farmId == farmId && isAccountBlocked(a.id));
   bool isOfferVisible(FarmerOffer selected) =>
       !isOfferHidden(selected.id) && !isFarmBlocked(selected.farmId);
-  List<Product> get catalogProducts =>
-      List.unmodifiable(_products.where((p) => offersFor(p.id).isNotEmpty));
+  List<Product> get catalogProducts => List.unmodifiable(
+    _products.where(
+      (product) => offersFor(
+        product.id,
+      ).any((offer) => availableKg(offer) >= offer.minimumKg),
+    ),
+  );
 
   Future<void> setAccountBlocked(
     String id, {

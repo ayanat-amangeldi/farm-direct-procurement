@@ -114,6 +114,12 @@ changes leave the preceding saved state intact rather than showing false success
 7. Total stock includes saved, non-cancelled orders. It cannot be set below the
    committed quantity. Zero stock pauses an uncommitted offer; offers without
    enough remaining stock for the minimum order are unavailable to new buyers.
+   If no visible offer from an active farmer meets its minimum quantity, the
+   product is also excluded from the buyer catalog, search, category results and
+   product count. Another qualifying farmer keeps the product listed. Restocking
+   or releasing order commitments makes it reappear automatically. The product
+   and offer remain available in the farmer's management records, and accepted
+   orders retain their original terms (FARM-20).
 8. Signing in as another farmer shows that farm's product list. An offer cannot be
    edited on behalf of another farm. The product type of a published
    offer stays fixed to preserve comparison groups; all other listed terms can
@@ -300,7 +306,7 @@ Earlier screenshots document previous increments; the current app starts at sign
 - `apps/mobile/lib/ui`: catalog, offers, checkout, confirmation, buyer/farmer order lists and details.
 - `apps/mobile/test`: business-rule and user-interaction checks.
 
-Run `flutter analyze` and `flutter test` from `apps/mobile`. The 63 checks cover
+Run `flutter analyze` and `flutter test` from `apps/mobile`. The 66 checks cover
 pricing, filtering, narrow-screen catalog layout, checkout validation, creation,
 history restoration, cancellation, overselling, concurrent saves, storage errors,
 farm ownership, confirmation, immutable terms, legacy history migration and
@@ -321,6 +327,10 @@ independent offer and farm restrictions, restoration rules, farmer-edit isolatio
 unchanged saved terms, failed hide/restore and block/unblock saves, concurrent
 moderation, schema v4 migration, corrupt history preservation, a narrow-screen
 admin workflow and buyer/farmer visibility checks.
+Three catalog-availability checks cover zero and below-minimum remaining stock,
+the exact-minimum boundary, restocking and released commitments, alternative
+farmers with moderation restrictions, and live buyer search/category/count
+updates after order placement and cancellation.
 The web release and iOS Simulator debug builds also pass. Manual browser verification at 390 × 844 covers
 creation of a 50 kg delivery order, restart persistence, saved terms, cancellation
 and history filters. Farmer verification adds account switching, farm-specific empty
