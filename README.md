@@ -82,9 +82,9 @@ backend and representative-user evaluation are planned outcomes for later stages
 **As of 24 October 2026:** the local Flutter demonstration prototype is complete
 for its agreed scope and merged into `main`. It targets Android, iOS and web.
 The [English report and readable documentation](docs/README.md) cover the initial
-analysis, design and formal evaluation plan. Supervisor feedback and publication
-of the separate editable architecture sources remain outstanding; the complete
-submission package and submission tag are not yet finished.
+analysis, design and formal evaluation plan. [Editable architecture diagrams and
+exports](diagrams/README.md) accompany the report. Supervisor feedback and the
+final submission checklist/tag remain outstanding.
 
 ### Implemented Prototype Features
 
@@ -163,6 +163,10 @@ docs/prototype/
   catalog-and-offers.md Buyer, farmer and admin walkthroughs and check results
   image-sources.md     Image provenance and generation prompts
   screenshots/         Captured prototype screens
+diagrams/
+  *.drawio             Editable three-page architecture source
+  *.svg / *.png        Readable context, use case and component diagram exports
+  README.md            Figure index, editing/export instructions and status
 FEATURES.md            System features and local implementation status
 README.md              Project overview, setup and verification instructions
 .gitignore             Generated/local-file exclusions
@@ -177,6 +181,8 @@ Available documentation:
 - [Existing system comparison](docs/existing-system-comparison.md).
 - [Technology comparison](docs/technology-comparison.md).
 - [Requirements and acceptance criteria](docs/requirements-specification.md).
+- [Architecture description and requirement mapping](docs/architecture.md).
+- [Editable architecture diagrams and SVG/PNG exports](diagrams/README.md).
 - [Verification and evaluation plan](docs/verification-and-evaluation-plan.md).
 - [Responsibilities, milestones and risks](docs/project-management-and-risks.md).
 - [System features](FEATURES.md).
@@ -184,8 +190,8 @@ Available documentation:
 - [Image sources and prompts](docs/prototype/image-sources.md).
 
 Architecture descriptions and figure exports are included in Section 7 of the
-complete report. Separate editable diagram sources and genuine supervisor
-feedback remain to be published. Interview dates/formats, complete platform
+complete report and linked separately above. Genuine supervisor feedback remains
+to be published. Interview dates/formats, complete platform
 acceptance and evaluation results also remain to be recorded. The documented
 plans do not establish that the planned backend or evaluation is complete.
 

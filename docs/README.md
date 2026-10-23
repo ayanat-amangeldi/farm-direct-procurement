@@ -19,7 +19,7 @@ references, architecture figures and mobile/web prototype screenshots.
 | 4. Existing system comparison | [System comparison](existing-system-comparison.md) | Open Food Network, Local Food Marketplace, Local Line and Barn2Door against nine criteria. |
 | 5. Technology comparison | [Technology comparison](technology-comparison.md) | Client, server, database and communication alternatives, with decisions and trade-offs. |
 | 6. Requirements specification | [Requirements and acceptance criteria](requirements-specification.md) | Business rules, 18 functional requirements, nine non-functional requirements and implementation boundaries. |
-| 7. Architecture and diagrams | Complete Word report, Section 7 | Architectural description, context, use case and draft component diagrams. Separate editable diagram sources remain to be published. |
+| 7. Architecture and diagrams | [Architecture description](architecture.md); [editable source and exports](../diagrams/README.md) | Context, use case and draft component diagrams, a three-page `.drawio` source, SVG/PNG exports and requirements-to-component mapping. |
 | 8. UX / prototype | Complete Word report, Section 8; [repository walkthrough](prototype/catalog-and-offers.md) | Buyer, farmer and administrator scenarios, with iPhone Simulator and desktop web screenshots. |
 | 9. Verification and evaluation plan | [Verification plan](verification-and-evaluation-plan.md) | Test strategy, environments, metrics, a manual-comparison baseline and a proposed participant evaluation. |
 | 10. Project management and risks | [Management and risk register](project-management-and-risks.md) | Team ownership, workflow, six milestones, nine risks and dependencies. |
