@@ -36,6 +36,12 @@ reconciliation retained the interview, supervisor and submission links. This
 post-merge update records status changes; it does not claim an additional peer
 approval of the refresh itself.
 
+The direct finalisation commits `41c1587` and `06bc3ed` did not receive peer
+review before publication. The [retrospective review record](reviews/finalization-post-merge-review.md)
+identifies the exact range and review requested from Dilyara. Until an actual
+review is submitted, it remains a requested follow-up; it does not change the
+timing of the earlier PR approvals or the frozen submission tag.
+
 The supplied Word report is unchanged and contains Sections 1–10. Interview
 metadata and Section 11 are linked repository supplements. Future backend work,
 full platform verification and representative-user evaluation remain separate
