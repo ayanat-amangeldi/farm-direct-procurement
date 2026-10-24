@@ -1,0 +1,5 @@
+Ayanat and Dilyara have made good progress since the last meeting. The problem framing and objectives are specific and verifiable, the needs analysis traces cleanly from the interviews into concrete requirements, and the prototype now covers all three user roles with the full order lifecycle, price snapshots and dated price history. Documentation, architecture diagrams and YouTrack task tracking are all in good order, and the team states the current limitations openly rather than glossing over them.
+
+One recommendation: the backend is now the critical path. Everything still runs on device-local storage, and FastAPI/PostgreSQL remain a recommendation on paper, so the team should bring a dated migration plan to the next meeting — what moves first, the API contract, and what stays local.
+
+— Aldiyar Salkenov, Supervisor

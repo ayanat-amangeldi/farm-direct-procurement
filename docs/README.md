@@ -23,8 +23,11 @@ references, architecture figures and mobile/web prototype screenshots.
 | 8. UX / prototype | Complete Word report, Section 8; [repository walkthrough](prototype/catalog-and-offers.md) | Buyer, farmer and administrator scenarios, with iPhone Simulator and desktop web screenshots. |
 | 9. Verification and evaluation plan | [Verification plan](verification-and-evaluation-plan.md) | Test strategy, environments, metrics, a manual-comparison baseline and a proposed participant evaluation. |
 | 10. Project management and risks | [Management and risk register](project-management-and-risks.md) | Team ownership, workflow, six milestones, nine risks and dependencies. |
+| 11. Supervisor feedback | [Feedback and responses](reviews/supervisor-feedback.md); [backend migration plan](backend-migration-plan.md) | Feedback dated 24 October 2026, the team's response, and proposed migration targets for the meeting on 27 October. |
 
 The Markdown files reproduce the selected report sections for review on GitHub.
+Section 11 and the migration plan were added after the supplied Word report was
+published; the preserved DOCX still contains Sections 1–10.
 The relevance section additionally records interview dates and format supplied
 by the team after report publication and links the five-question interview guide.
 Headings, lists, tables and hyperlinks are converted to Markdown; the complete
@@ -72,10 +75,13 @@ completion remains subject to each task's acceptance criteria.
   reported evaluation results. The latest local implementation check recorded
   66 passing Flutter tests and clean analysis for commit `4f60cbb`, merged through
   [PR #6](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/6).
-- **Supervisor feedback is pending** and will be added after the supervisor has
-  reviewed the materials. No supervisor approval is claimed by this report
-  publication. Feedback and responses are tracked in
+- **Supervisor feedback dated 24 October 2026 is recorded** in the
+  [feedback and response record](reviews/supervisor-feedback.md), tracked in
   [FARM-18](https://farm-direct-procurement.youtrack.cloud/issue/FARM-18).
+  The supervisor identified backend migration as the critical path. The team has
+  drafted a dated plan for the meeting on 27 October; proposed dates and API
+  details still require review. The feedback does not approve an implemented
+  backend or report completed shared-system verification.
 
 ## Publication and Traceability
 
