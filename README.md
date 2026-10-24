@@ -83,8 +83,10 @@ backend and representative-user evaluation are planned outcomes for later stages
 for its agreed scope and merged into `main`. It targets Android, iOS and web.
 The [English report and readable documentation](docs/README.md) cover the initial
 analysis, design and formal evaluation plan. [Editable architecture diagrams and
-exports](diagrams/README.md) accompany the report. Supervisor feedback and the
-final submission checklist/tag remain outstanding.
+exports](diagrams/README.md) accompany the report. [Supervisor feedback dated
+24 October 2026](docs/reviews/supervisor-feedback.md) is recorded with the team's
+response and a [proposed backend migration plan](docs/backend-migration-plan.md)
+for the meeting on 27 October. The final submission checklist/tag remains open.
 
 ### Implemented Prototype Features
 
@@ -185,15 +187,18 @@ Available documentation:
 - [Editable architecture diagrams and SVG/PNG exports](diagrams/README.md).
 - [Verification and evaluation plan](docs/verification-and-evaluation-plan.md).
 - [Responsibilities, milestones and risks](docs/project-management-and-risks.md).
+- [Supervisor feedback and response record](docs/reviews/supervisor-feedback.md).
+- [Dated backend migration plan for the next meeting](docs/backend-migration-plan.md).
 - [System features](FEATURES.md).
 - [Prototype scenarios, expected results, limitations and screenshots](docs/prototype/catalog-and-offers.md).
 - [Image sources and prompts](docs/prototype/image-sources.md).
 
 Architecture descriptions and figure exports are included in Section 7 of the
-complete report and linked separately above. Genuine supervisor feedback remains
-to be published. Interview dates/formats, complete platform
-acceptance and evaluation results also remain to be recorded. The documented
-plans do not establish that the planned backend or evaluation is complete.
+complete report and linked separately above. The supervisor feedback and team
+response are published separately as Section 11. Interview metadata publication,
+complete platform acceptance and evaluation results are tracked separately.
+The backend migration dates are proposed targets for discussion on 27 October;
+the documented plan does not establish completed backend integration or evaluation.
 
 ## Setup and Execution
 
