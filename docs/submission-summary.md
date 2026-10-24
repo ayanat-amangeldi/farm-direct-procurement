@@ -25,7 +25,9 @@ These workflows use local demonstration data. They do not constitute a shared pr
 ## Submission Materials
 
 Status updated on 24 October 2026 after the three reviewed documentation PRs
-were merged into `main` (merge snapshot `b1fdfb3`).
+were merged into `main` (merge snapshot `b1fdfb3`). Final verification is recorded
+for [`pre-defense-1`](https://github.com/ayanat-amangeldi/farm-direct-procurement/tree/pre-defense-1)
+in the [version verification record](reviews/pre-defense-1-verification.md).
 
 | Material | Evidence | Publication status |
 | --- | --- | --- |
@@ -81,9 +83,12 @@ also records the scoped public-reader setup and earlier anonymous checks. These
 read checks establish task-reading access; they do not test write restrictions
 or the committee's own devices.
 
-No Flutter tests, simulator checks, diagram exports or user-evaluation sessions
-were run for these documentation/status changes. Historical missing pre-merge
-reviews on early PRs remain a documented process limitation.
+The earlier documentation PR reviews did not rerun Flutter. Final verification
+on 24 October separately reran `flutter analyze --no-pub` (no issues) and
+`flutter test --no-pub --reporter expanded` (all 66 tests passed) on the unchanged
+application tree. No new simulator/platform builds, diagram exports or user
+evaluation were performed. Historical missing pre-merge reviews on early PRs
+remain a documented process limitation.
 
 ## Current Limitations
 
@@ -109,11 +114,12 @@ recommendation. Its dates are proposed targets for discussion rather than
 approved deadlines or completed implementation. FARM-4 and FARM-10 retain the
 schema/API/pricing-contract follow-up work.
 
-## Remaining Finalisation and Next-Stage Work
+## Submission Version and Next-Stage Work
 
 - FARM-11 and FARM-18 are complete after their peer-reviewed PRs were merged.
-- FARM-19 remains in Review for final snapshot confirmation and the
-  `pre-defense-1` tag. The tag has not been created; existing tags are unchanged.
+- The final first-stage version is designated by the annotated `pre-defense-1`
+  tag. FARM-19 records its exact remote commit and closure after tag verification.
+  The existing `prob-period-1` tag is unchanged.
 - If a single Word file is required, integrate the repository supplements before
   that upload and verify the resulting formatting separately.
 - Prepare the schema/API drafts and migration discussion for 27 October under

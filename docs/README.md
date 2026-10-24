@@ -10,8 +10,10 @@ The supplied report is preserved without changes, including its tables,
 references, architecture figures and mobile/web prototype screenshots.
 
 For submission readiness, see the [first pre-defense checklist](submission-checklist.md)
-and [submission summary](submission-summary.md). Both documents distinguish
-materials already in `main` from proposed changes in open pull requests.
+and [submission summary](submission-summary.md). The
+[pre-defense-1 verification record](reviews/pre-defense-1-verification.md)
+records the final checks and version boundary. The documents distinguish
+published first-stage materials from next-stage implementation and evaluation.
 
 ## Report Sections
 
@@ -76,9 +78,10 @@ completion remains subject to each task's acceptance criteria.
   REST-style JSON API are the proposed shared-system baseline and are not yet
   connected to the prototype.
 - Acceptance targets and planned measurements in Sections 6 and 9 are not
-  reported evaluation results. The latest local implementation check recorded
-  66 passing Flutter tests and clean analysis for commit `4f60cbb`, merged through
-  [PR #6](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/6).
+  reported evaluation results. Final verification on 24 October 2026 reran
+  all 66 Flutter tests and analysis successfully. The application tree is unchanged
+  from `4f60cbb`, merged through [PR #6](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/6);
+  see the [version verification record](reviews/pre-defense-1-verification.md).
 - **Supervisor feedback dated 24 October 2026 is recorded** in the
   [feedback and response record](reviews/supervisor-feedback.md), tracked in
   [FARM-18](https://farm-direct-procurement.youtrack.cloud/issue/FARM-18).
@@ -103,5 +106,7 @@ The complete report is 10,894,873 bytes. Its SHA-256 is:
 ```
 
 The same hash was verified against the supplied final DOCX before publication.
-The `pre-defense-1` tag will identify the reviewed submission once the remaining
-submission items are ready; this documentation change does not create that tag.
+The [`pre-defense-1` tag](https://github.com/ayanat-amangeldi/farm-direct-procurement/tree/pre-defense-1)
+identifies the first-stage version verified on 24 October 2026. Resolve the tag
+for the exact commit; its scope and remaining work are recorded in the
+[verification record](reviews/pre-defense-1-verification.md). Existing tags remain fixed.

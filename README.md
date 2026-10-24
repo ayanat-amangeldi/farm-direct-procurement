@@ -283,9 +283,10 @@ flutter analyze
 flutter test
 ```
 
-Latest recorded implementation checks: **66 tests passed**, and analysis reported
-no issues. The following platform builds succeeded earlier in prototype
-development; they were not rerun for the catalog-availability correction in PR #6:
+Final version checks on **24 October 2026**: **66 tests passed**, and analysis
+reported no issues. See the [version verification record](docs/reviews/pre-defense-1-verification.md).
+The following platform builds succeeded earlier in prototype development; they
+were not rerun for the catalog-availability correction or this version check:
 
 ```sh
 flutter build web --release --no-wasm-dry-run
@@ -320,7 +321,9 @@ into `main`. Record supervisor feedback at agreed checkpoints and address it
 through traceable follow-up changes. Mark tasks complete when their acceptance
 criteria are met. Keep real credentials, API keys and private user data out of Git.
 
-The first submission tag `pre-defense-1` will be created when the submission
-package is ready. Later stages will use `pre-defense-2` and `final-pre-defense`;
-previous submission tags must remain fixed. Each submission should identify its
-tag, completed work, known limitations and outstanding tasks.
+The first submission version is [`pre-defense-1`](https://github.com/ayanat-amangeldi/farm-direct-procurement/tree/pre-defense-1),
+verified on 24 October 2026. Its [verification record](docs/reviews/pre-defense-1-verification.md),
+[checklist](docs/submission-checklist.md) and [summary](docs/submission-summary.md)
+record completed work, known limitations and outstanding tasks. Later stages
+will use `pre-defense-2` and `final-pre-defense`; previous submission tags must
+remain fixed.
