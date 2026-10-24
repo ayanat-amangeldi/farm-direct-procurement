@@ -24,60 +24,99 @@ These workflows use local demonstration data. They do not constitute a shared pr
 
 ## Submission Materials
 
-| Material | Evidence | Status on `main` at `d931496` |
-| --- | --- | --- |
-| English report, Sections 1–10 | [Word report](report/farm-direct-pre-defense-report.docx) | Available in `main`; original report retained. |
-| Readable analysis, requirements and planning documents | [Documentation index](README.md), [proposal](project-proposal.md), [requirements](requirements-specification.md), [verification plan](verification-and-evaluation-plan.md), [management and risks](project-management-and-risks.md) | Available in `main`. |
-| Architecture description and editable diagrams/exports | [Architecture description](architecture.md), [diagram index and files](../diagrams/README.md) | Available in `main`. |
-| Prototype walkthrough and screenshots | [Prototype documentation](prototype/catalog-and-offers.md); report Section 8 | Available as documented artifacts. Screenshots are not user-evaluation results. |
-| Interview dates, phone-call formats and interviewer guide | [PR #9 — FARM-11](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/9) | Pending — approved but still open and unmerged; not in `main`. |
-| Supervisor feedback and backend migration plan | [PR #10 — FARM-18](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/10) | Pending — changes requested; still open and unmerged, not in `main`. Feedback is a separate Markdown supplement and is absent from the Word report. |
-| First pre-defense checklist and this summary | [Checklist](submission-checklist.md), this document, [PR #11](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/11) | Pending — proposed in open PR #11; not yet merged into `main`. |
+Status updated on 24 October 2026 after the three reviewed documentation PRs
+were merged into `main` (merge snapshot `b1fdfb3`).
 
-The supplied Word report contains Sections 1–10. The interview session metadata/guide in approved-but-unmerged PR #9 and the feedback/migration documents in PR #10 (changes requested) are repository supplements, not additions already present in that DOCX.
+| Material | Evidence | Publication status |
+| --- | --- | --- |
+| English report, Sections 1–10 | [Word report](report/farm-direct-pre-defense-report.docx) | Published; original report retained. |
+| Analysis, requirements and planning | [Documentation index](README.md), [proposal](project-proposal.md), [requirements](requirements-specification.md), [evaluation plan](verification-and-evaluation-plan.md), [management and risks](project-management-and-risks.md) | Published in `main`. |
+| Architecture and editable diagrams/exports | [Architecture](architecture.md), [diagram index](../diagrams/README.md) | Published in `main`. |
+| Prototype walkthrough and screenshots | [Prototype documentation](prototype/catalog-and-offers.md); report Section 8 | Published; screenshots document scenarios rather than completed user evaluation. |
+| Interview dates, phone-call format and guide | [Evidence](evidence-of-relevance.md), [guide](research/interview-guide.md), [merged PR #9](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/9) | Published in `main`, merge `7eb5a0f`. |
+| Supervisor feedback and migration plan | [Feedback/response](reviews/supervisor-feedback.md), [supplied-text transcript](reviews/sources/supervisor-feedback-2026-10-24.txt), [migration plan](backend-migration-plan.md), [merged PR #10](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/10) | Published in `main`, merge `39817b2`. |
+| Submission checklist and summary | [Checklist](submission-checklist.md), [merged PR #11](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/11) | Published in `main`, merge `b1fdfb3`; statuses refreshed after merging. |
+
+The preserved Word report contains Sections 1–10. The interview session metadata
+and Section 11 are repository supplements. If the submission channel requires a
+single Word file, integrating these supplements remains a separate formatting
+step before that upload; it has not been performed in this update.
 
 ## Verification Evidence
 
-### Previously recorded in the repository
+### Previously recorded implementation checks
 
-- The documentation index records 66 passing Flutter tests and clean `flutter analyze` for commit `4f60cbb`, merged through [PR #6](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/6). This is prior repository evidence; those commands were not run for this documentation change.
-- The [prototype walkthrough](prototype/catalog-and-offers.md) records manual browser checks for buyer, farmer and administrator flows, persistence, order lifecycle, moderation and price history. This is previously recorded evidence, not a new user study.
-- The root [README](../README.md) records earlier successful web-release and iOS Simulator builds, while noting that builds were not rerun for the catalog-availability correction. It also identifies Android runtime/device checks and representative-user evaluation as outstanding.
-- The [evaluation plan](verification-and-evaluation-plan.md) defines planned checks and measurements. Planned targets are not results.
+- The [documentation index](README.md) records 66 passing Flutter tests and clean
+  analysis at `4f60cbb`, merged through [PR #6](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/6).
+- The [prototype walkthrough](prototype/catalog-and-offers.md) records manual
+  browser checks covering buyer, farmer and administrator scenarios, order
+  lifecycle, persistence, moderation and price history.
+- The root [README](../README.md) records earlier web-release and iOS Simulator
+  builds. These builds were not rerun for the catalog-availability correction.
+- The [evaluation plan](verification-and-evaluation-plan.md) defines future
+  measurements and acceptance targets. It is a completed planning deliverable;
+  execution of the complete platform/accessibility matrix and representative-user
+  evaluation remains future work.
 
-### Checked while preparing this FARM-19 change
+### Documentation preparation and peer review
 
-- Confirmed the authenticated GitHub account is `dilyara-anetbayeva`; repository Git author configuration is `dilyara` / `231860557+dilyara-anetbayeva@users.noreply.github.com`.
-- Fetched `origin/main` and created the requested branch from commit `d931496`.
-- Confirmed PR #9 and PR #10 are both open and inspected their changed-file lists and proposed materials.
-- Read the repository README and documentation index and inspected the supplied Word report's document text; the report contains Sections 1–10. The feedback record is separate in the proposed PR #10 materials.
-- Verified unauthenticated HTTPS repository access with `git ls-remote`; this does not verify YouTrack or committee access.
-- YouTrack FARM-19 could not be opened with the available web viewer. No YouTrack issue status or committee access is claimed as verified.
-- For this documentation change, local link resolution and `git diff --check` are run before publication. Flutter, simulator, diagram-export and user-evaluation commands are not run for this change.
-- The Flutter SDK was not available on `PATH` in this environment; no Flutter command was run.
+Dilyara prepared the FARM-19 checklist and summary in PR #11 from her GitHub
+account, with identifiable commits. Her preparation record included inspection
+of Word section headings, local-link checks, a clean diff check and anonymous
+GitHub repository access. YouTrack was unavailable in her initial viewer; later
+access checks are recorded separately below.
+
+Dilyara approved PR #9 at `f8149f5` and re-approved PR #10 at `bdb767b` after
+reading the authenticated FARM-18 record and comparing the feedback transcript.
+Ayanat [approved PR #11 at `c5c2f93`](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/11#pullrequestreview-5637288125)
+after reviewing the full diff, resolving all 76 local links checked and verifying
+that the Word report and application code were unchanged. Before merging,
+index-conflict reconciliation retained both sets of already approved additions.
+This status refresh does not claim an additional peer approval of its own.
+
+On 24 October 2026, anonymous API requests without cookies or Authorization
+headers returned HTTP 200 with descriptions and comments for FARM-19, FARM-11
+and FARM-18. The [FARM-19 access record](https://farm-direct-procurement.youtrack.cloud/issue/FARM-19)
+also records the scoped public-reader setup and earlier anonymous checks. These
+read checks establish task-reading access; they do not test write restrictions
+or the committee's own devices.
+
+No Flutter tests, simulator checks, diagram exports or user-evaluation sessions
+were run for these documentation/status changes. Historical missing pre-merge
+reviews on early PRs remain a documented process limitation.
 
 ## Current Limitations
 
-The prototype stores demonstration data locally on the device. It does not yet provide a shared production backend or synchronisation between independent devices.
+The prototype stores demonstration data locally on the device. It does not yet
+provide a shared production backend or synchronisation between independent
+devices. FastAPI, PostgreSQL and REST remain the proposed backend baseline.
 
-FastAPI, PostgreSQL and REST are the proposed backend baseline. Their selection and migration plan do not constitute an implemented backend.
-
-Demonstration order placement does not perform real payment processing.
-
-Formal user evaluation and the complete platform test matrix remain subject to the evaluation plan and available verification evidence. Screenshots and initial interviews do not establish completed prototype usability evaluation.
+Demonstration order placement does not process real payments. Screenshots and
+needs interviews do not establish completed prototype usability evaluation.
+Remaining implementation/evaluation checks are tracked in the evaluation plan.
 
 ## Supervisor Feedback and Next Steps
 
-The team-supplied record in [PR #10](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/10) identifies Supervisor Aldiyar Salkenov and records feedback received on 24 October 2026. It schedules the next meeting for 27 October 2026 and recommends preparing a dated backend migration plan covering migration order, API contracts and the boundary between shared and local data.
+The [feedback record](reviews/supervisor-feedback.md) contains the supplied
+feedback from Aldiyar Salkenov dated 24 October 2026, its provenance, and the
+team's response. Dilyara compared the transcript with the team-posted FARM-18
+record; this is not independent authentication of a separate signed document.
 
-PR #10 is still open, so the feedback and plan are not yet in `main`. The record states that the feedback is a separate Markdown supplement and is not included in the preserved Word report. Proposed migration dates are planning targets, not supervisor-approved deadlines or completed work; the 27 October meeting has not yet occurred.
+The next meeting is scheduled for 27 October 2026. The supervisor recommended a
+dated migration plan covering migration order, API contracts and what stays
+local. The [published migration plan](backend-migration-plan.md) addresses this
+recommendation. Its dates are proposed targets for discussion rather than
+approved deadlines or completed implementation. FARM-4 and FARM-10 retain the
+schema/API/pricing-contract follow-up work.
 
-## Outstanding Submission Actions
+## Remaining Finalisation and Next-Stage Work
 
-- Merge the approved interview evidence and interviewer guide in [PR #9](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/9); approval alone has not added it to `main`.
-- Address the requested source-verification change in [PR #10](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/10), request another review, and merge only after approval.
-- Decide separately whether to reconcile repository supplements into a formatted Word-report update; the current DOCX has Sections 1–10 only.
-- Review and merge [PR #11](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/11) for this FARM-19 checklist and summary.
-- Verify YouTrack and committee access through an appropriate unauthenticated/committee access method.
-- Complete and record the outstanding verification and evaluation work in the evaluation plan.
-- Create `pre-defense-1` only after final changes are merged and the exact reviewed commit has been checked. Do not move existing tags.
+- FARM-11 and FARM-18 are complete after their peer-reviewed PRs were merged.
+- FARM-19 remains in Review for final snapshot confirmation and the
+  `pre-defense-1` tag. The tag has not been created; existing tags are unchanged.
+- If a single Word file is required, integrate the repository supplements before
+  that upload and verify the resulting formatting separately.
+- Prepare the schema/API drafts and migration discussion for 27 October under
+  FARM-4/FARM-10, then implement and evaluate the shared system in the next phase.
+- Execute remaining platform/accessibility and representative-user checks under
+  the evaluation plan. Their pending execution does not mean the plan is absent.
