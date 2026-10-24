@@ -10,11 +10,25 @@ Tracked in [FARM-18](https://farm-direct-procurement.youtrack.cloud/issue/FARM-1
 | --- | --- |
 | Supervisor | Aldiyar Salkenov |
 | Feedback date | 24 October 2026, confirmed by the team |
-| Source | Written feedback supplied by the team for repository publication |
+| Source | [Text supplied by Ayanat for repository publication](sources/supervisor-feedback-2026-10-24.txt); provenance and comparison instructions below |
 | Reviewed areas named in the feedback | Problem framing and objectives; interview-to-requirement traceability; three-role prototype; order lifecycle, accepted prices and price history; documentation, architecture and task tracking; current limitations |
 | Next meeting | 27 October 2026, confirmed by the team |
 
-The quotation below preserves the feedback supplied by the team.
+The quotation below preserves the feedback supplied by the team. Ayanat
+provided the feedback text in the project conversation and separately confirmed
+24 October as the feedback date and 27 October as the next meeting date.
+
+The linked UTF-8 text file records that supplied wording for reviewers who
+cannot access YouTrack. It is a repository transcription of the team-provided
+text, not a separately obtained supervisor email or signed document. The file
+contains only the two feedback paragraphs and attribution; the team's response
+and proposed schedule are kept outside it.
+
+To verify the quotation, compare the text file with Section 11.2 after removing
+the Markdown blockquote prefixes (`> ` and the blank `>` lines). The paragraph
+text, punctuation and attribution must match. This verifies transcription
+consistency with the supplied text, rather than independent authentication of
+its sender. No YouTrack login is required to read the repository copy.
 
 ## 11.2. Supervisor's Feedback
 
