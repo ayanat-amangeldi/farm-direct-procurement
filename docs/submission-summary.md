@@ -30,11 +30,11 @@ These workflows use local demonstration data. They do not constitute a shared pr
 | Readable analysis, requirements and planning documents | [Documentation index](README.md), [proposal](project-proposal.md), [requirements](requirements-specification.md), [verification plan](verification-and-evaluation-plan.md), [management and risks](project-management-and-risks.md) | Available in `main`. |
 | Architecture description and editable diagrams/exports | [Architecture description](architecture.md), [diagram index and files](../diagrams/README.md) | Available in `main`. |
 | Prototype walkthrough and screenshots | [Prototype documentation](prototype/catalog-and-offers.md); report Section 8 | Available as documented artifacts. Screenshots are not user-evaluation results. |
-| Interview dates, phone-call formats and interviewer guide | [PR #9 — FARM-11](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/9) | Pending — proposed in an open PR, not in `main`. |
-| Supervisor feedback and backend migration plan | [PR #10 — FARM-18](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/10) | Pending — proposed in an open PR, not in `main`; feedback is a separate Markdown supplement and is absent from the Word report. |
+| Interview dates, phone-call formats and interviewer guide | [PR #9 — FARM-11](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/9) | Pending — approved but still open and unmerged; not in `main`. |
+| Supervisor feedback and backend migration plan | [PR #10 — FARM-18](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/10) | Pending — changes requested; still open and unmerged, not in `main`. Feedback is a separate Markdown supplement and is absent from the Word report. |
 | First pre-defense checklist and this summary | [Checklist](submission-checklist.md), this document, [PR #11](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/11) | Pending — proposed in open PR #11; not yet merged into `main`. |
 
-The supplied Word report contains Sections 1–10. The interview session metadata/guide in PR #9 and the feedback/migration documents in PR #10 are repository supplements, not additions already present in that DOCX.
+The supplied Word report contains Sections 1–10. The interview session metadata/guide in approved-but-unmerged PR #9 and the feedback/migration documents in PR #10 (changes requested) are repository supplements, not additions already present in that DOCX.
 
 ## Verification Evidence
 
@@ -74,8 +74,8 @@ PR #10 is still open, so the feedback and plan are not yet in `main`. The record
 
 ## Outstanding Submission Actions
 
-- Review and merge the interview evidence and interviewer guide in [PR #9](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/9).
-- Review and merge the supervisor-feedback record and migration plan in [PR #10](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/10).
+- Merge the approved interview evidence and interviewer guide in [PR #9](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/9); approval alone has not added it to `main`.
+- Address the requested source-verification change in [PR #10](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/10), request another review, and merge only after approval.
 - Decide separately whether to reconcile repository supplements into a formatted Word-report update; the current DOCX has Sections 1–10 only.
 - Review and merge [PR #11](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/11) for this FARM-19 checklist and summary.
 - Verify YouTrack and committee access through an appropriate unauthenticated/committee access method.
