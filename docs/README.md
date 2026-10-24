@@ -18,7 +18,7 @@ materials already in `main` from proposed changes in open pull requests.
 | Report section | Readable repository version | Contents |
 | --- | --- | --- |
 | 1. Project proposal | [Proposal and scope](project-proposal.md) | Problem, intended users, objectives, responsibilities, scope and expected outcomes. |
-| 2. Evidence of relevance | [Interview findings](evidence-of-relevance.md) | Four reported interviews, requirement implications and limitations. |
+| 2. Evidence of relevance | [Interview findings](evidence-of-relevance.md); [interview guide](research/interview-guide.md) | Four reported phone interviews on 23 October 2026, requirement implications and limitations. |
 | 3. Literature review | [Literature review](literature-review.md) | Critical synthesis, a structured analysis table and 12 references, including 10 journal articles. |
 | 4. Existing system comparison | [System comparison](existing-system-comparison.md) | Open Food Network, Local Food Marketplace, Local Line and Barn2Door against nine criteria. |
 | 5. Technology comparison | [Technology comparison](technology-comparison.md) | Client, server, database and communication alternatives, with decisions and trade-offs. |
@@ -27,8 +27,13 @@ materials already in `main` from proposed changes in open pull requests.
 | 8. UX / prototype | Complete Word report, Section 8; [repository walkthrough](prototype/catalog-and-offers.md) | Buyer, farmer and administrator scenarios, with iPhone Simulator and desktop web screenshots. |
 | 9. Verification and evaluation plan | [Verification plan](verification-and-evaluation-plan.md) | Test strategy, environments, metrics, a manual-comparison baseline and a proposed participant evaluation. |
 | 10. Project management and risks | [Management and risk register](project-management-and-risks.md) | Team ownership, workflow, six milestones, nine risks and dependencies. |
+| 11. Supervisor feedback | [Feedback and responses](reviews/supervisor-feedback.md); [backend migration plan](backend-migration-plan.md) | Feedback dated 24 October 2026, the team's response, and proposed migration targets for the meeting on 27 October. |
 
 The Markdown files reproduce the selected report sections for review on GitHub.
+Section 11 and the migration plan were added after the supplied Word report was
+published; the preserved DOCX still contains Sections 1–10.
+The relevance section additionally records interview dates and format supplied
+by the team after report publication and links the five-question interview guide.
 Headings, lists, tables and hyperlinks are converted to Markdown; the complete
 Word report retains the original layout and figures. Section numbers are retained
 so references to other report sections can be followed in the complete report.
@@ -65,8 +70,8 @@ completion remains subject to each task's acceptance criteria.
 
 - The relevance section records reported experiences from two farmers and two
   buyers. It is qualitative needs evidence, not a completed prototype usability
-  evaluation. Interview dates and formats still need to be recorded in the
-  research evidence; none have been invented for this publication.
+  evaluation. The team confirmed that F1, F2, B1 and B2 were interviewed by phone
+  on 23 October 2026; this metadata is recorded in the relevance section and guide.
 - Flutter workflows use fictional, device-local data. FastAPI, PostgreSQL and a
   REST-style JSON API are the proposed shared-system baseline and are not yet
   connected to the prototype.
@@ -74,10 +79,13 @@ completion remains subject to each task's acceptance criteria.
   reported evaluation results. The latest local implementation check recorded
   66 passing Flutter tests and clean analysis for commit `4f60cbb`, merged through
   [PR #6](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/6).
-- **Supervisor feedback is pending** and will be added after the supervisor has
-  reviewed the materials. No supervisor approval is claimed by this report
-  publication. Feedback and responses are tracked in
+- **Supervisor feedback dated 24 October 2026 is recorded** in the
+  [feedback and response record](reviews/supervisor-feedback.md), tracked in
   [FARM-18](https://farm-direct-procurement.youtrack.cloud/issue/FARM-18).
+  The supervisor identified backend migration as the critical path. The team has
+  drafted a dated plan for the meeting on 27 October; proposed dates and API
+  details still require review. The feedback does not approve an implemented
+  backend or report completed shared-system verification.
 
 ## Publication and Traceability
 
