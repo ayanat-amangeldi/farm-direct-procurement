@@ -185,6 +185,8 @@ Available documentation:
 - [Editable architecture diagrams and SVG/PNG exports](diagrams/README.md).
 - [Verification and evaluation plan](docs/verification-and-evaluation-plan.md).
 - [Responsibilities, milestones and risks](docs/project-management-and-risks.md).
+- [First pre-defense submission checklist](docs/submission-checklist.md) and
+  [submission summary](docs/submission-summary.md).
 - [System features](FEATURES.md).
 - [Prototype scenarios, expected results, limitations and screenshots](docs/prototype/catalog-and-offers.md).
 - [Image sources and prompts](docs/prototype/image-sources.md).

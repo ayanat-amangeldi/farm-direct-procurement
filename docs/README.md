@@ -9,6 +9,10 @@ prototype.
 The supplied report is preserved without changes, including its tables,
 references, architecture figures and mobile/web prototype screenshots.
 
+For submission readiness, see the [first pre-defense checklist](submission-checklist.md)
+and [submission summary](submission-summary.md). Both documents distinguish
+materials already in `main` from proposed changes in open pull requests.
+
 ## Report Sections
 
 | Report section | Readable repository version | Contents |
