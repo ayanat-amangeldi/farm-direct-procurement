@@ -32,7 +32,7 @@ These workflows use local demonstration data. They do not constitute a shared pr
 | Prototype walkthrough and screenshots | [Prototype documentation](prototype/catalog-and-offers.md); report Section 8 | Available as documented artifacts. Screenshots are not user-evaluation results. |
 | Interview dates, phone-call formats and interviewer guide | [PR #9 — FARM-11](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/9) | Pending — proposed in an open PR, not in `main`. |
 | Supervisor feedback and backend migration plan | [PR #10 — FARM-18](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/10) | Pending — proposed in an open PR, not in `main`; feedback is a separate Markdown supplement and is absent from the Word report. |
-| First pre-defense checklist and this summary | [Checklist](submission-checklist.md), this document | Pending — proposed in the current, unmerged FARM-19 change. |
+| First pre-defense checklist and this summary | [Checklist](submission-checklist.md), this document, [PR #11](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/11) | Pending — proposed in open PR #11; not yet merged into `main`. |
 
 The supplied Word report contains Sections 1–10. The interview session metadata/guide in PR #9 and the feedback/migration documents in PR #10 are repository supplements, not additions already present in that DOCX.
 
@@ -77,7 +77,7 @@ PR #10 is still open, so the feedback and plan are not yet in `main`. The record
 - Review and merge the interview evidence and interviewer guide in [PR #9](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/9).
 - Review and merge the supervisor-feedback record and migration plan in [PR #10](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/10).
 - Decide separately whether to reconcile repository supplements into a formatted Word-report update; the current DOCX has Sections 1–10 only.
-- Review and merge this FARM-19 checklist and summary change.
+- Review and merge [PR #11](https://github.com/ayanat-amangeldi/farm-direct-procurement/pull/11) for this FARM-19 checklist and summary.
 - Verify YouTrack and committee access through an appropriate unauthenticated/committee access method.
 - Complete and record the outstanding verification and evaluation work in the evaluation plan.
 - Create `pre-defense-1` only after final changes are merged and the exact reviewed commit has been checked. Do not move existing tags.
