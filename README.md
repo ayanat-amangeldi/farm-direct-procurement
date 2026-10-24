@@ -187,6 +187,8 @@ Available documentation:
 - [Editable architecture diagrams and SVG/PNG exports](diagrams/README.md).
 - [Verification and evaluation plan](docs/verification-and-evaluation-plan.md).
 - [Responsibilities, milestones and risks](docs/project-management-and-risks.md).
+- [First pre-defense submission checklist](docs/submission-checklist.md) and
+  [submission summary](docs/submission-summary.md).
 - [Supervisor feedback and response record](docs/reviews/supervisor-feedback.md).
 - [Dated backend migration plan for the next meeting](docs/backend-migration-plan.md).
 - [System features](FEATURES.md).
