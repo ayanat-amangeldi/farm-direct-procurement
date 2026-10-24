@@ -40,6 +40,12 @@ The tag is an annotated version reference, not a signed release or a claim of
 production readiness. The exact remote tag target is recorded in FARM-19 after
 publication and checked before task closure.
 
+The two finalisation commits were pushed directly to `main` without a separate
+pre-merge peer review. Their exact scope and requested retrospective review are
+recorded in the [post-merge review record](finalization-post-merge-review.md).
+Any subsequent review is a later supplement; the original submission tag stays
+fixed and is not retroactively described as having received that review.
+
 ## Submission Boundary and Follow-up
 
 This version contains the local Flutter prototype, the original English report

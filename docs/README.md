@@ -15,6 +15,10 @@ and [submission summary](submission-summary.md). The
 records the final checks and version boundary. The documents distinguish
 published first-stage materials from next-stage implementation and evaluation.
 
+The [finalisation post-merge review record](reviews/finalization-post-merge-review.md)
+identifies two subsequent direct updates to `main` and the retrospective review
+requested for them. It supplements the frozen submission without moving its tag.
+
 ## Report Sections
 
 | Report section | Readable repository version | Contents |
