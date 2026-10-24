@@ -2,20 +2,20 @@
 
 [Documentation index](README.md) · [Complete report with figures](report/farm-direct-pre-defense-report.docx)
 
-This is a readable copy of the corresponding section of the supplied English report. The complete Word report retains its original text, layout and figures.
+This is a readable version of the corresponding section of the supplied English report, supplemented with interview dates, format and a link to the interview guide confirmed by the team after report publication. The complete Word report retains its original text, layout and figures.
 
 ## 2.1. Method and Participants
 
 Four interviews were conducted with representatives of the intended user groups: two farmers, one individual buyer, and one business buyer. Each interview covered five open-ended questions about current practices, information needs, pricing, supplier comparison, stock management, and order coordination.
 
-Participants are identified using anonymous codes.
+All four interviews took place by phone on **23 October 2026**, as confirmed by the team. Participants are identified using anonymous codes. The [interview guide](research/interview-guide.md) records the five questions for each participant group.
 
-| Participant | User group | Profile |
-| --- | --- | --- |
-| F1 | Farmer | Sells agricultural products through regular customers, recommendations, phone calls, and WhatsApp. |
-| F2 | Farmer | Supplies milk and dairy products to individual customers and small shops. |
-| B1 | Individual buyer | Purchases vegetables and dairy products for household consumption in Astana. |
-| B2 | Business buyer | Purchases agricultural products regularly for a small café in Astana. |
+| Participant | User group | Interview date | Format | Profile |
+| --- | --- | --- | --- | --- |
+| F1 | Farmer | 23 October 2026 | Phone call | Sells agricultural products through regular customers, recommendations, phone calls, and WhatsApp. |
+| F2 | Farmer | 23 October 2026 | Phone call | Supplies milk and dairy products to individual customers and small shops. |
+| B1 | Individual buyer | 23 October 2026 | Phone call | Purchases vegetables and dairy products for household consumption in Astana. |
+| B2 | Business buyer | 23 October 2026 | Phone call | Purchases agricultural products regularly for a small café in Astana. |
 
 ## 2.2. Main Findings
 

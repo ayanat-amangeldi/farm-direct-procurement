@@ -14,7 +14,7 @@ references, architecture figures and mobile/web prototype screenshots.
 | Report section | Readable repository version | Contents |
 | --- | --- | --- |
 | 1. Project proposal | [Proposal and scope](project-proposal.md) | Problem, intended users, objectives, responsibilities, scope and expected outcomes. |
-| 2. Evidence of relevance | [Interview findings](evidence-of-relevance.md) | Four reported interviews, requirement implications and limitations. |
+| 2. Evidence of relevance | [Interview findings](evidence-of-relevance.md); [interview guide](research/interview-guide.md) | Four reported phone interviews on 23 October 2026, requirement implications and limitations. |
 | 3. Literature review | [Literature review](literature-review.md) | Critical synthesis, a structured analysis table and 12 references, including 10 journal articles. |
 | 4. Existing system comparison | [System comparison](existing-system-comparison.md) | Open Food Network, Local Food Marketplace, Local Line and Barn2Door against nine criteria. |
 | 5. Technology comparison | [Technology comparison](technology-comparison.md) | Client, server, database and communication alternatives, with decisions and trade-offs. |
@@ -25,6 +25,8 @@ references, architecture figures and mobile/web prototype screenshots.
 | 10. Project management and risks | [Management and risk register](project-management-and-risks.md) | Team ownership, workflow, six milestones, nine risks and dependencies. |
 
 The Markdown files reproduce the selected report sections for review on GitHub.
+The relevance section additionally records interview dates and format supplied
+by the team after report publication and links the five-question interview guide.
 Headings, lists, tables and hyperlinks are converted to Markdown; the complete
 Word report retains the original layout and figures. Section numbers are retained
 so references to other report sections can be followed in the complete report.
@@ -61,8 +63,8 @@ completion remains subject to each task's acceptance criteria.
 
 - The relevance section records reported experiences from two farmers and two
   buyers. It is qualitative needs evidence, not a completed prototype usability
-  evaluation. Interview dates and formats still need to be recorded in the
-  research evidence; none have been invented for this publication.
+  evaluation. The team confirmed that F1, F2, B1 and B2 were interviewed by phone
+  on 23 October 2026; this metadata is recorded in the relevance section and guide.
 - Flutter workflows use fictional, device-local data. FastAPI, PostgreSQL and a
   REST-style JSON API are the proposed shared-system baseline and are not yet
   connected to the prototype.
